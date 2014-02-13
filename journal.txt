@@ -1,0 +1,21 @@
+Thu Feb 13 15:53:56 CET 2014
+
+Fait:
+- Créer Gitlab
+- Chercher le NaoQi sans le trouver.
+- Regarder Python
+
+A faire:
+- Utiliser choregraphe pour tester les capteurs, les moteurs
+- Comment apprendre un mouvement au Nao?
+
+Thu Feb  6 14:41:05 CET 2014
+
+Charasson Clement
+Dias Alain
+
+- La dernière version de la suite logicielle
+- Vérifier la mise à jour du Nao.
+- Gitlab
+- Fixer un ou deux créneaux d'utilisation du Nao dans la semaine.
+
