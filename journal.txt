@@ -1,3 +1,16 @@
+Thu Feb 20 15:21:13 CET 2014
+
+Fait:
+- Utiliser choregraphe pour tester les capteurs, les moteurs
+- Programmer des mouvements de bras, se lever, parler.
+- Comment apprendre un mouvement au Nao?
+
+A faire:
+- Comprendre le modèle d'événements de NaoQi.
+- Réfléchir une architecture pour votre logiciel.
+- Ecrire un programme qui reconnaît une balle rouge.
+
+
 Thu Feb 13 15:53:56 CET 2014
 
 Fait:
