@@ -1,3 +1,11 @@
+jeudi 27 février 2014, 18:09:35 (UTC+0100)
+
+
+- regarder open CV (analyse d'image)
+- commencer à faire des diagrammes UML
+- avec des modules des sous modules
+
+
 Thu Feb 20 15:21:13 CET 2014
 
 Fait:
