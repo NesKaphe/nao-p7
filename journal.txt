@@ -1,6 +1,29 @@
+vendredi 7 mars 2014, 15:26:10
+
+Fait:
+-Reflexion et conception d'une architecture du programme:
+     .Trois modules principaux:
+	-Analyse qui prend les informations des capteurs (tactiles, vision) et déclenche des evenements
+	-Decision qui gère les évenements reçus par l'analyse. Il interagit avec le module d'analyse et d'action
+	-Action qui effectue les mouvements demandés
+     .Ces modules déclencheront et écouteront des évenements. Grâce à ce système nous pourrons traiter des informations de manière asynchrone.
+	(Par exemple: Il sera possible de rechercher la balle pendant un déplacement)
+
+A faire:
+-Continuer à étudier opencv et commencer à faire des tests. L'objectif est de faire une détection de balle
+-Faire le diagramme UML de l'architecture du programme  
+
+jeudi 6 mars 2014, 18:08:23
+
+Fait:
+-Recherche et lecture de tutoriels sur opencv
+
+A faire:
+-Une architecture
+-Un squelette de code (detection de balle, action avec la balle)
+
+
 jeudi 27 février 2014, 18:09:35 (UTC+0100)
-
-
 
 - regarder open CV (analyse d'image)
 - commencer à faire des diagrammes UML
