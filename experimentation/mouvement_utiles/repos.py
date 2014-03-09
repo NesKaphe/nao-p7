@@ -1,6 +1,6 @@
 from naoqi import ALProxy
 
-#destiné à mettre au repos les moteurs du robot
+#destine a mettre au repos les moteurs du robot
 
 
 IP = "192.168.1.3"

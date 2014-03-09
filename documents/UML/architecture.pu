@@ -1,0 +1,117 @@
+@startuml
+
+
+
+skinparam usecase {
+	BackgroundColor YellowGreen
+	BorderColor YellowGreen
+
+	BackgroundColor<<Module>> CadetBlue 
+	BorderColor<<Module>> CadetBlue 
+	
+}
+
+(Decision)
+(Analyse)
+(Action)
+(Capteur)<<Module>>
+(Vision)<<Module>>
+(Memoire)<<Module>>
+(Etalonnage)<<Module>>
+(Mouvement)<<Module>>
+(Evenement)<<Abstract>>
+
+(Decision)-up->(Analyse):effectuer\nune analyse
+(Decision)-down->(Action):effectuer\nune action
+
+(Analyse)--up->(Capteur)
+(Analyse)-right->(Vision)
+(Capteur)-->(Analyse)
+(Vision)->(Analyse)
+
+(Decision)-right->(Memoire)
+(Memoire)-left->(Decision)
+
+(Action)-->(Mouvement)
+(Mouvement)-->(Action)
+
+(Etalonnage)..>(Vision):extends
+
+
+note left of (Capteur)
+contient toute les
+interractions avec les capteurs
+end note
+
+note top of (Vision)
+contient les fonctionnalitées
+d'annalyse d'image avec openCV
+end note
+
+note top of (Etalonnage)
+Pour Calibrer la couleur rouge de la balle
+end note
+
+note right of (Mouvement)
+Contient des mouvements prédéfinits
+end note
+
+
+
+note left of (Decision)
+C'est le coeur de décision du robot.
+Il reçois et enregistre les évenements et actions
+effectuées. Et décide celon ces prioritées
+ce qu'il faut faire.
+end note
+
+
+note left of (Analyse)
+Permet de faire les différents calculs lier 
+à l'analyse de l'environnement. Il enverra 
+des évenements de type capteurs ou vision.
+Le "Module" de décision pourra lui demandé
+de faire des calculparticulier (calcule de distance).
+end note
+
+note left of (Action)
+Contient les enchainements de mouvements
+à effectuer. Son entrée Evenement lui 
+permet d'adapter son mouvement à la situation.
+end note
+
+note right of (Memoire)
+Enregistre tout les évenements et actions effectuées.
+(l'enregistrement des évenement va nous permettre de faire
+du débugage)
+end note
+
+note right of (Evenement)
+Un évenement est un élément de communication.
+Il l'Analyse la Décision et L'Action vont écouter
+et déclancher différents évenements les concernants.
+ICI Rajouter des évenements particulier :
+ Evenements Capteurs Evenements, Mouvement, Erreur....
+end note
+
+/'
+<<<<<ça devient totalement laid si on rajoute les liens avec evenements>>>>>>
+(Decision)-->(Evenement)
+(Analyse)-down->(Evenement)
+(Action)-up->(Evenement)
+(Capteur)-->(Evenement)
+(Vision)-->(Evenement)
+(Memoire)-->(Evenement)
+(Etalonnage)-->(Evenement)
+(Mouvement)-->(Evenement)
+(Evenement)-->(Decision)
+(Evenement)-up->(Analyse)
+(Evenement)-down->(Action)
+(Evenement)-->(Capteur)
+(Evenement)-->(Vision)
+(Evenement)-->(Memoire)
+(Evenement)-->(Etalonnage)
+(Evenement)-->(Mouvement)
+'/
+
+@enduml

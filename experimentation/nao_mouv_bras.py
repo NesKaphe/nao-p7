@@ -5,7 +5,8 @@ import time
 from naoqi import ALProxy
 
 def main():
-        IP = "192.168.1.3"
+        #IP = "192.168.1.3"
+	IP = "169.254.28.144"
         PORT = 9559
 
         try:
