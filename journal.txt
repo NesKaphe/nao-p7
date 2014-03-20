@@ -1,3 +1,27 @@
+vendredi 14 mars 2014
+
+Fait:
+-Enregistrement avec chorégraphe du mouvement qui servira à ramasser une balle pour le nao
+-Recherches sur le format d'images retourné par opencv afin de l'utiliser sur opencv:
+	-Il faut utiliser la methode "fromstring" de numpy puis utiliser la methode "reshape"
+
+A faire:
+-Rendre fonctionnel le code existant avec la webcam du pc sur la caméra du nao
+
+jeudi 13 mars 2014
+
+Fait:
+-Programme python utilisant opencv pour detection de balle avec une webcam :
+	- Calibrage des couleurs à filtrer
+	- Un cercle est dessiné autour de la balle detectée
+
+Problème soulevé:
+-La lumière change la couleur perçue par la webcam et empeche quelques fois la detection de la balle
+
+A faire:
+-Recherches pour utiliser la camera du nao à la place de la webcam du pc dans un programme utilisant opencv
+
+
 vendredi 7 mars 2014, 15:26:10
 
 Fait:
