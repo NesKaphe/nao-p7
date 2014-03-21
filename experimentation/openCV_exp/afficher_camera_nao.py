@@ -20,7 +20,7 @@ except:
 	pass
 
 # specifier au module le type dimage requis 
-moduleName = videoProxy.subscribeCamera(moduleName, camera, kVGA, kBGRColorSpace, 30) 
+moduleName = videoProxy.subscribeCamera(moduleName, camera, kQVGA, kBGRColorSpace, 30) 
 key=0
 
 cv2.namedWindow("cnt",cv.CV_WINDOW_AUTOSIZE)
@@ -50,11 +50,11 @@ v2=255
 #SVH ombre
 
 h1=0
-s1=154
-v1=87
-h2=21
-s2=220
-v2=236
+s1=105
+v1=159
+h2=189
+s2=161
+v2=255
 
 
 #Autre SVH
@@ -113,9 +113,20 @@ while(key !=10):
 	thresh = cv2.inRange(im2,mini,maxi)
 	#thresh = cv2.blur(thresh,(10,10))
 	thresh = cv2.medianBlur(thresh,5)
+
+	kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
+	thresh = cv2.dilate(thresh,kernel,iterations=2)
+	thresh = cv2.erode(thresh,kernel,iterations=1)
+
 	contours = cv2.findContours(thresh.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
-	cv2.drawContours(thresh,contours,-1,cv.CV_RGB(255,255,255))
-	
+	if contours != None:
+		for i in contours:
+			approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
+			x,y,w,h = cv2.boundingRect(i)
+			cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),2)
+	cv2.drawContours(im,contours,-1,cv.CV_RGB(0,255,0))
+
+	'''
 	circles = cv2.HoughCircles(thresh,cv.CV_HOUGH_GRADIENT,1,minDist,param1=50,param2=30,minRadius=0,maxRadius=0)
 	if circles != None:
 		circles = np.uint16(np.around(circles))
@@ -129,7 +140,7 @@ while(key !=10):
 		    if compteur > 20:
 			break
 		    compteur += 1
-		    	
+	'''	    	
 	
 	cv2.imshow('thresh',thresh)
 

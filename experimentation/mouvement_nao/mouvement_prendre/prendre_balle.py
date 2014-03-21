@@ -1,5 +1,7 @@
 # Choregraphe simplified export in Python.
 from naoqi import ALProxy
+import almath
+import time
 
 def baisser(IP,PORT):
 	names = list()
@@ -120,17 +122,31 @@ def baisser(IP,PORT):
 	  print err
 
 def getKeyboardKey():
+	pass
 
-	
+def brasGaucheEpaule(IP,PORT,ANGLE):
+	try:
+		motion = ALProxy("ALMotion", IP, PORT)
+		names   = "LShoulderRoll"
+		angles  = ANGLE*almath.TO_RAD
+		frac    = 0.1 #10% de le vitesse max
+		motion.setAngles(names,angles,frac)
+
+	except Exception, err:
+		print err
+
+def brasGauche
 
 def main():
 	IP = "192.168.1.3"
 	PORT = 9559
 
-    posture = ALProxy("ALRobotPosture", IP, PORT)
+    	posture = ALProxy("ALRobotPosture", IP, PORT)
 	posture.goToPosture("StandInit",1)
 
-	baisser(IP,PORT)
+	#baisser(IP,PORT)
+
+	brasGaucheEpaule(IP,PORT,50)
 
 
 main()

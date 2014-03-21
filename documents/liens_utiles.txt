@@ -1,3 +1,13 @@
 Open CV : explication pour une detection de balle
 
 	http://www.mon-club-elec.fr/pmwiki_mon_club_elec/pmwiki.php?n=MAIN.OutilsProcessingOpenCVSuiviBalle
+
+	http://naoworkshop.blogspot.fr/2012/09/
+
+	http://stiddsin.free.fr/explorer/Projets/03-Nao-Challenge/formation-aldebaran/openCV2.py
+
+
+Moteurs nao :
+	Les noms des moteurs du bras gauche :
+	https://community.aldebaran-robotics.com/doc/1-14/family/robots/joints_robot.html#robot-joints-v4-left-arm-joints
+
