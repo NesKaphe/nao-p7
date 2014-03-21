@@ -1,22 +1,45 @@
-import Tkinter as tk
+import sys,pygame
+#from pygame import event ,key
+from pygame.locals import *
 
-def key(event):
-    if event.keysym == 'Escape':
-        root.destroy()
-    if event.char == event.keysym:
-     # normal number and letter characters
-        print( 'Normal Key %r' % event.char )
-    elif len(event.char) == 1:
-      # charcters like []/.,><#$ also Return and ctrl/key
-        print( 'Punctuation Key %r (%r)' % (event.keysym, event.char) )
-    else:
-      # f1 to f12, shift keys, caps lock, Home, End, Delete ...
-        print( 'Special Key %r' % event.keysym )
+pygame.init()
+
+def clavier():
+	try:
+		keys = pygame.key.get_pressed()
+		#print "type de keys",type(keys[0])
+		#print keys
+	
+		if keys[pygame.locals.K_LEFT] :
+			print "left"
+		if keys[pygame.locals.K_RIGHT]:
+			print "right"  
+		if keys[pygame.locals.K_UP]:
+			print "up"
+		if keys[pygame.locals.K_DOWN]:
+			print "down"
+		if keys[pygame.locals.K_q]:
+			print "quit"
+			#return False
+		"""
+		else :
+			print "rien"
+		"""
+	except Exception, e:
+		print "probleme",e
+		#return False
+		
+	#return True
 
 
-root = tk.Tk()
-print( "Press a key (Escape key to exit):" )
-root.bind_all('<Key>', key)
-# don't show the tk window
-root.withdraw()
-root.mainloop()
+
+def main():
+	print "hello"
+	while True :
+ 		clavier()
+
+	print "fin"
+
+
+main()
+
