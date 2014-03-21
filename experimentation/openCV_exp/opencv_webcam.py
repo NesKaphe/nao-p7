@@ -57,8 +57,8 @@ while True:
 	contours = cv2.findContours(thresh.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
 	if contours != None:
 		for i in contours:
-			approx = cv2.approxPolyDP(contours[0],0.1*cv2.arcLength(contours[0],True),True)
-			x,y,w,h = cv2.boundingRect(contours[0])
+			approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
+			x,y,w,h = cv2.boundingRect(i)
 			cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),2)
 	cv2.drawContours(im,contours,-1,cv.CV_RGB(0,255,0))
 
