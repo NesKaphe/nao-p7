@@ -3,6 +3,7 @@ from vision_definitions import *
 import cv2
 import cv2.cv as cv
 import numpy as np
+import math
 #from cv2 import * 
 #from numpy import *
 
@@ -50,10 +51,10 @@ v2=255
 #SVH ombre
 
 h1=0
-s1=105
-v1=159
-h2=189
-s2=161
+s1=125
+v1=105
+h2=204
+s2=170
 v2=255
 
 
@@ -67,6 +68,7 @@ s2=202
 v2=255
 '''
 minDist=20
+pourcent=80
 thresh = None #image apres le traitement 
 def rien(x):
 	pass
@@ -80,7 +82,13 @@ cv.CreateTrackbar("S_MAX","cnt",s2,255,rien)
 cv.CreateTrackbar("V_MIN","cnt",v1,255,rien)
 cv.CreateTrackbar("V_MAX","cnt",v2,255,rien)
 cv.CreateTrackbar("minDistCircle","cnt",minDist,20,rien)
+cv.CreateTrackbar("pourcentage_detection","cnt",pourcent,100,rien)
 
+
+def getPercentage(radius,contour):
+	aire_objet = cv2.contourArea(contour)
+	aire_cercle = math.pi*radius*radius
+	return (aire_objet/aire_cercle)*100
 
 
 while(key !=10):
@@ -106,6 +114,7 @@ while(key !=10):
 	v1 = cv2.getTrackbarPos('V_MIN','cnt')
 	v2 = cv2.getTrackbarPos('V_MAX','cnt')
 	minDist = cv2.getTrackbarPos('minDistCircle','cnt')
+	pourcent = cv2.getTrackbarPos('pourcentage_detection','cnt')
 	mini = np.array([h1,s1,v1],np.uint8)
 	maxi = np.array([h2,s2,v2],np.uint8)
 	#im = cv2.medianBlur(im,15)
@@ -121,12 +130,17 @@ while(key !=10):
 	contours = cv2.findContours(thresh.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
 	if contours != None:
 		for i in contours:
-			approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
-			x,y,w,h = cv2.boundingRect(i)
-			cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),2)
+			approx = cv2.approxPolyDP(i,0.05*cv2.arcLength(i,True),True)
+			#x,y,w,h = cv2.boundingRect(approx)
+			(x,y),radius = cv2.minEnclosingCircle(approx)
+			#cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),2)
+			center = (int(x),int(y))
+			radius = int(radius)
+			if getPercentage(radius,i) > pourcent:
+				cv2.circle(im,center,radius,(0,255,255),2)
 	cv2.drawContours(im,contours,-1,cv.CV_RGB(0,255,0))
 
-	'''
+	
 	circles = cv2.HoughCircles(thresh,cv.CV_HOUGH_GRADIENT,1,minDist,param1=50,param2=30,minRadius=0,maxRadius=0)
 	if circles != None:
 		circles = np.uint16(np.around(circles))
@@ -134,13 +148,13 @@ while(key !=10):
 		compteur = 0
 		for i in circles[0,:]:
 		    # draw the outer circle
-		    cv2.circle(im,(i[0],i[1]),i[2],(0,255,0),2)
+		    cv2.circle(im,(i[0],i[1]),i[2],(255,255,0),2)
 		    # draw the center of the circle
 		    cv2.circle(im,(i[0],i[1]),2,(0,0,255),3)
 		    if compteur > 20:
 			break
 		    compteur += 1
-	'''	    	
+		    	
 	
 	cv2.imshow('thresh',thresh)
 
