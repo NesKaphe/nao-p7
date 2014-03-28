@@ -11,6 +11,7 @@ class FilterColor:
 	
 	def __init__(self):
 		self.objets = []
+		self.loadConfig()
 		
 
 	def loadConfig(self):
