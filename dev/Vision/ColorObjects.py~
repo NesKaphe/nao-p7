@@ -11,6 +11,7 @@ class FilterColor:
 	
 	def __init__(self):
 		self.objets = []
+		self.loadConfig()
 		
 
 	def loadConfig(self):
@@ -72,7 +73,7 @@ class FilterColor:
 		videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
 		cam = Camera(videoProxy, "Calibrage")
 		cam.subscribe()
-		image = camera.getNewImage()
+		image = cam.getNewImage()
 
 		# Webcam du pc pour les moments sans nao
 		"""
