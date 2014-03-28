@@ -1,0 +1,69 @@
+import cv2
+import cv2.cv as cv
+import numpy as np
+import os
+
+class FilterColor:
+	
+	def __init__(self):
+		self.objets = []
+		
+	        #Peut etre changer ca en mettant le path dans un fichier de config
+		fichier = open("./Data/colors.txt", "r")
+		
+		'''
+		Je met ici mais on trouvera un autre endroit pour l'expliquer:
+		le fichier colors.txt devra contenir sur une ligne H min, 
+		S min, V min, H max, S max, V max 
+		pour les couleurs de cet objet
+		'''
+
+		#lecture du fichier
+		for ligne in fichier:
+			#On retire le \n de fin de ligne
+			ligne = ligne.rstrip('\n')
+			params = ligne.split(', ')
+			self.objets.append(params)
+
+		fichier.close()
+		
+
+	def filter(self, imageHSV, nomObjet):
+		mini = None
+		maxi = None
+		for objet in self.objets:
+			if objet[0] == nomObjet:
+				mini = np.array([objet[1],objet[3],objet[5]],np.uint8)
+				maxi = np.array([objet[2],objet[4],objet[6]],np.uint8)
+				break
+
+		if mini != None:
+			#Filtre de l'image en fonction de la couleur
+			thresh = cv2.inRange(imageHSV,mini,maxi) 
+
+			#On va maintenant corriger quelques imperfection de l'image filtree
+			thresh = cv2.medianBlur(thresh,5)
+			kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
+			thresh = cv2.dilate(thresh,kernel,iterations=2)
+			thresh = cv2.erode(thresh,kernel,iterations=1)
+			
+			return thresh
+		else:
+			raise Exception('Filtre impossible [nomObjet incorrect]')
+
+	def multipleFilter(self, listeImagesHSV, nomObjet):
+		for 
+
+	''' va afficher la fenetre pour calibrer les couleurs + interaction avec la console pour
+	faire plusieurs enregistrements [TODO : Vendredi 28 mars !!]
+	'''
+	def calibrage(self, imageHSV):
+		pass
+		
+		
+class BallObject:
+
+	def __init__(self):
+		self.precision = 80
+
+	
