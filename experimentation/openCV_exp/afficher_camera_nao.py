@@ -49,14 +49,14 @@ v2=255
 '''
 
 #SVH ombre
-
+'''
 h1=0
 s1=125
 v1=105
 h2=204
 s2=170
 v2=255
-
+'''
 
 #Autre SVH
 '''
@@ -67,6 +67,14 @@ h2=11
 s2=202
 v2=255
 '''
+#Autre SVH 2
+h1=128
+h2=255
+s1=150
+s2=255
+v1=0
+v2=255
+
 minDist=20
 pourcent=80
 thresh = None #image apres le traitement 
@@ -140,7 +148,8 @@ while(key !=10):
 				cv2.circle(im,center,radius,(0,255,255),2)
 	cv2.drawContours(im,contours,-1,cv.CV_RGB(0,255,0))
 
-	
+	"""
+	#version qui ne marche pas pour l'instant
 	circles = cv2.HoughCircles(thresh,cv.CV_HOUGH_GRADIENT,1,minDist,param1=50,param2=30,minRadius=0,maxRadius=0)
 	if circles != None:
 		circles = np.uint16(np.around(circles))
@@ -154,7 +163,7 @@ while(key !=10):
 		    if compteur > 20:
 			break
 		    compteur += 1
-		    	
+	"""
 	
 	cv2.imshow('thresh',thresh)
 

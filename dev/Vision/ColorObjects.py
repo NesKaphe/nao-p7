@@ -4,7 +4,8 @@ import cv2
 import cv2.cv as cv
 import numpy as np
 import os
-import Camera
+from Camera import Camera
+from naoqi import ALProxy
 
 class FilterColor:
 	
@@ -68,14 +69,16 @@ class FilterColor:
 		boucle = True
 		
 		# Nao
-		#videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
-		#cam = Camera(videoProxy, "Calibrage")
-		#cam.subscribe()
-		#image = camera.getNewImage()
+		videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
+		cam = Camera(videoProxy, "Calibrage")
+		cam.subscribe()
+		image = cam.getNewImage()
 
 		# Webcam du pc pour les moments sans nao
+		"""
 		cap = cv2.VideoCapture(0)
 		ret, image = cap.read()
+		"""
 
 		#On affiche la capture originale (Sinon, on fera sur video)
 		cv2.imshow("Original", image)

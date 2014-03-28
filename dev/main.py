@@ -5,11 +5,11 @@ from Vision.Camera import Camera
 from Vision.ColorObjects import FilterColor
 import cv2
 
-#videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
 
-#camera = Camera(videoProxy,"toto")
+videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
 
-#camera.subscribe()
+camera = Camera(videoProxy,"toto")
+camera.subscribe()
 '''
 im = camera.getNewImage()
 im2 = cv2.cvtColor(im,cv2.COLOR_BGR2HSV)

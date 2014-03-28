@@ -20,8 +20,9 @@ cv2.imshow("original",im)
 cv2.imshow("Objet",im3)
 '''
 
-Lim = camera.getMultipleImages(5,0.3)
-
-cv2.waitKey(0)
+#Lim = camera.getMultipleImages(5,0.3)
+filter = FilterColor()
+filter.calibrage()
+#cv2.waitKey(0)
 
 camera.unsubscribe()
