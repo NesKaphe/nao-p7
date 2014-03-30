@@ -1,3 +1,34 @@
+vedredi 28 mars 2014
+Fait:
+-Commencer le module d'Analyse et le module de Mouvement
+But : faire tourner la tete pour chercher la balle
+-Dans l'Analyse :
+	-il y a tout ce qui concerne le calibrage (peut être que 
+	on va le déplacer dans un module spécialement fait pour)
+	-il y a possibilité de sauvegarder et de réutiliser ce calibrage
+	-permet de retourner la zone de la balle dans l'écran celon les repères x;y
+-Dans le mouvement :
+	-class Head :
+		-incrAngles va recevoir les informations qur la zone à rechercher
+		cette méthode va permettre de centre la balle dans la vision du
+		robot
+
+A faire :
+	-terminer la recherche de balle avec la tete
+	-ajouter le module decision avec le premier mode (chercher balle)
+	-faire des mesures et implémenter la distance estimé de la balle
+	-implémenter le mode déplacement vers balle :
+		-tourner le corp du robot pour prendre la direction de la balle
+		-aller vers la balle
+	-implémenter le mode prise de balle :
+		phase 1 mise en place du robot:
+		pour ce faire il faut que 3 conditions soit remplit :
+			-angle de la tête soit bon
+			-position dans l'image bonne
+			-distance de la balle bonne
+		phase 2 ce mettre à "genoux"
+		phase 3 prendre la balle
+
 vendredi 14 mars 2014
 
 Fait:
