@@ -5,7 +5,8 @@
 
 import sys
 from naoqi import ALProxy
-from Analyse import *
+from Analyse.Analyse import *
+from Analyse.Vision import *
 from Mouvement import *
 
 
@@ -17,4 +18,10 @@ class Decision:
         self.motion = ALProxy("ALMotion", self.IP , self.PORT)
         self.posture = ALProxy("ALRobotPosture", self.IP , self.PORT)
         self.videoProxy = ALProxy("ALVideoDevice", self.IP, self.PORT)
+        self.rootine()
+        
+    def rootine (self):
+        a = Analyse(self.videoProxy)
+        a.filtre.calibrage()
+        mh = Head(self.motion,self.posture)
         

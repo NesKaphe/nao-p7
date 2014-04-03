@@ -17,9 +17,9 @@ IP = "192.168.1.3"
 PORT = 9559
 
 class Head:
-	def __init__(self):
-		self.motion = ALProxy("ALMotion", IP , PORT)
-		self.posture = ALProxy("ALRobotPosture", IP , PORT)
+	def __init__(self,motion,posture):
+		self.motion = motion
+		self.posture = posture
 		self.angleYaw = 0.0 #récupérer les angles plustôt que ça
 		self.anglePitch = 0.0 #récupérer les angles plustôt que ça
 		#correspond au temps/vitesse pour atteindre l'angle voulut
@@ -85,12 +85,12 @@ class Head:
 			print i
 			i-=1
 
-
+"""
 #petit test
 h = Head()	
 h.test2()
 h.reset()
 h.motion.setStiffnesses("Head", 0.0)
 print "fin"
-
+"""
 
