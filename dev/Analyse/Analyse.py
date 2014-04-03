@@ -15,7 +15,7 @@ class Analyse:
         self.videoProxy = videoProxy
 
         #On recupère l'interface avec la caméra du nao
-        self.camera = Camera.Camera(self.videoProxy, "Analyse")
+        self.camera = Camera(self.videoProxy, "Analyse")
         #self.camera.subscribe()
 
         #On recupère notre filtre de couleurs
