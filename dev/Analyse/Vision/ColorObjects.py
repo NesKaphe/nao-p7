@@ -82,9 +82,6 @@ class FilterColor:
 		ret, image = cap.read()
 		"""
 
-		#On affiche la capture originale (Sinon, on fera sur video)
-		cv2.imshow("Original", image)
-
 		#definition des fenêtres
 		cv2.namedWindow("Original",cv.CV_WINDOW_AUTOSIZE)
 		
@@ -122,9 +119,15 @@ class FilterColor:
 			cv.CreateTrackbar("V_MAX","Configuration",v2,255,callback)
 
 			while True:
+				#On affiche la capture originale (Sinon, on fera sur video)
+				cv2.imshow("Original", images[imageCourante])
 				#On convertis le colorspace de l'image en HSV
 				imageHSV = cv2.cvtColor(images[imageCourante],cv2.COLOR_BGR2HSV)
-				imageCourante = imageCourante + 1
+				if imageCourante >= 4:
+					imageCourante = 0
+				else:
+					imageCourante = imageCourante + 1
+
 				#on recupère les valeurs des trackbars
 				h1 = cv2.getTrackbarPos("H_MIN","Configuration")
 				h2 = cv2.getTrackbarPos("H_MAX","Configuration")
