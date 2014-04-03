@@ -71,7 +71,6 @@ class FilterColor:
 		# Nao
 		videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
 		cam = Camera(videoProxy, "Calibrage")
-		cam.subscribe()
 		#image = cam.getNewImage()
 		images = cam.getMultipleImages(5,0.1)
 		imageCourante = 0
@@ -81,10 +80,6 @@ class FilterColor:
 		cap = cv2.VideoCapture(0)
 		ret, image = cap.read()
 		"""
-
-
-		#definition des fenêtres
-		cv2.namedWindow("Original",cv.CV_WINDOW_AUTOSIZE)
 		
 		#Callback pour les trackbar
 		def callback(x):
@@ -97,6 +92,8 @@ class FilterColor:
 		while boucle:
 			nom = raw_input("Nom de l'objet : ")
 
+			#definition des fenêtres
+			cv2.namedWindow("Original",cv.CV_WINDOW_AUTOSIZE)
 			cv2.namedWindow("Configuration",cv.CV_WINDOW_AUTOSIZE)
 			cv2.namedWindow("Calibrage",cv.CV_WINDOW_AUTOSIZE)
 
@@ -165,6 +162,7 @@ class FilterColor:
 
 			cv2.destroyWindow("Calibrage")
 			cv2.destroyWindow("Configuration")
+			cv2.destroyWindow("Original")
 			cv2.waitKey(1)
 
 			rep = raw_input("Faire une autre saisie ? <n pour stopper>")
@@ -173,5 +171,5 @@ class FilterColor:
 
 		#On recharge finalement les nouvelles configurations d'objets
 		self.loadConfig()
-
+		cam.unsubscribe()
 	

@@ -119,17 +119,17 @@ class Analyse:
     def afficheImagesCourantes(self):
         cv2.imshow("Original",self.imageCourante)
         cv2.imshow("Filtre",self.imageFiltreCourante)
+        cv2.waitKey(1)
 
 #========Zone de test à effacer===========
 
 #filtre = FilterColor()
 #filtre.calibrage()
-'''
+"""
 analyse = Analyse()
 while True:
     result = analyse.BallPosition()
     print result
     analyse.afficheImagesCourantes()
     cv2.waitKey(1)
-
-'''
+"""
