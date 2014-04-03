@@ -21,8 +21,16 @@ class Decision:
         self.rootine()
         
     def rootine (self):
+        #phase de calibrage
         a = Analyse(self.videoProxy)
-        a.filtre.calibrage()
+        #a.filtre.calibrage()
+        
+        
+        
         mh = Head(self.motion,self.posture)
-        mh.test()#petit test
+        while True :
+            DirBalle = a.BallPosition()
+            a.afficheImagesCourantes()
+            print "DirBalle",DirBalle
+            #mh.incrAngle(DirBalle[0],DirBalle[1])
         

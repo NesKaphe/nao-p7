@@ -109,7 +109,7 @@ class Analyse:
             else:
                 resY = 1
 
-            return resX, resYxxx
+            return resX, resY
         else:
             return None
     
