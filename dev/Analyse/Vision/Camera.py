@@ -17,6 +17,10 @@ class Camera:
 		self.moduleName = moduleName
 		self.camera = camera
 		self.resolution = resolution
+		self.subscribe()
+
+	def __del__(self):
+		self.unsubscribe()
 
 	def subscribe(self):
 		self.proxy.subscribeCamera(self.moduleName, 
@@ -58,7 +62,10 @@ class Camera:
 
 		return imageNumpy
 		
-
+	'''
+	getMultipleImages: Prend "nbImages" images de la caméra de nao puis retourne une
+	liste de Numpy array (OpenCV)
+	'''
 	def getMultipleImages(self,nbImages,pauseCapture):
 		listeImages = []
 		while nbImages > 0:

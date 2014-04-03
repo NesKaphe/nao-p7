@@ -63,7 +63,7 @@ class FilterColor:
 		pass
 
 	''' va afficher la fenetre pour calibrer les couleurs + interaction avec la console pour
-	faire plusieurs enregistrements [TODO : Vendredi 28 mars !!]
+	faire plusieurs enregistrements
 	'''
 	def calibrage(self):
 		boucle = True
@@ -72,7 +72,9 @@ class FilterColor:
 		videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
 		cam = Camera(videoProxy, "Calibrage")
 		cam.subscribe()
-		image = cam.getNewImage()
+		#image = cam.getNewImage()
+		images = cam.getMultipleImages(5,0.1)
+		imageCourante = 0
 
 		# Webcam du pc pour les moments sans nao
 		"""
@@ -82,9 +84,6 @@ class FilterColor:
 
 		#On affiche la capture originale (Sinon, on fera sur video)
 		cv2.imshow("Original", image)
-
-		#On convertis le colorspace de l'image en HSV
-		imageHSV = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
 
 		#definition des fenêtres
 		cv2.namedWindow("Original",cv.CV_WINDOW_AUTOSIZE)
@@ -123,20 +122,26 @@ class FilterColor:
 			cv.CreateTrackbar("V_MAX","Configuration",v2,255,callback)
 
 			while True:
+				#On convertis le colorspace de l'image en HSV
+				imageHSV = cv2.cvtColor(images[imageCourante],cv2.COLOR_BGR2HSV)
+				imageCourante = imageCourante + 1
+				#on recupère les valeurs des trackbars
 				h1 = cv2.getTrackbarPos("H_MIN","Configuration")
 				h2 = cv2.getTrackbarPos("H_MAX","Configuration")
 				s1 = cv2.getTrackbarPos("S_MIN","Configuration")
 				s2 = cv2.getTrackbarPos("S_MAX","Configuration")
 				v1 = cv2.getTrackbarPos("V_MIN","Configuration")
 				v2 = cv2.getTrackbarPos("V_MAX","Configuration")
-
 				mini = np.array([h1,s1,v1],np.uint8)
 				maxi = np.array([h2,s2,v2],np.uint8)
+				
+				#On effectue maintenant les traitements de l'image
 				thresh = cv2.inRange(imageHSV,mini,maxi)
 				kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 				thresh = cv2.dilate(thresh,kernel,iterations=2)
 				thresh = cv2.erode(thresh,kernel,iterations=1)
 				
+				#Puis on affiche à l'écran l'image
 				cv2.imshow("Calibrage", thresh)
 
 				key = cv2.waitKey(10)
@@ -164,14 +169,5 @@ class FilterColor:
 
 		#On recharge finalement les nouvelles configurations d'objets
 		self.loadConfig()
-				
-
-			
-		
-		
-class BallObject:
-
-	def __init__(self):
-		self.precision = 80
 
 	
