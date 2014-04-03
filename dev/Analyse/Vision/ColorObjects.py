@@ -83,7 +83,7 @@ class FilterColor:
 		"""
 
 		#On affiche la capture originale (Sinon, on fera sur video)
-		cv2.imshow("Original", image)
+		cv2.imshow("Original", images)
 
 		#definition des fenêtres
 		cv2.namedWindow("Original",cv.CV_WINDOW_AUTOSIZE)

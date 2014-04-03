@@ -7,7 +7,7 @@ import sys
 from naoqi import ALProxy
 from Analyse.Analyse import *
 from Analyse.Vision import *
-from Mouvement import *
+from Mouvement.Mouvement import *
 
 
 class Decision:
@@ -24,4 +24,5 @@ class Decision:
         a = Analyse(self.videoProxy)
         a.filtre.calibrage()
         mh = Head(self.motion,self.posture)
+        mh.test()#petit test
         
