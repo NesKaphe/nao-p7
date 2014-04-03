@@ -94,3 +94,14 @@ h.motion.setStiffnesses("Head", 0.0)
 print "fin"
 """
 
+"""
+contient tout ce qui concerne la marche
+"""
+
+class Marche :
+	def __init__(self,motion,posture):
+		self.motion = motion
+		self.posture = posture
+	
+	def marche(self):
+		motion.moveInit()

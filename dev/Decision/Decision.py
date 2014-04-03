@@ -23,7 +23,7 @@ class Decision:
     def rootine (self):
         #phase de calibrage
         a = Analyse(self.videoProxy)
-        #a.filtre.calibrage()
+        a.filtre.calibrage()
         
         
         
@@ -34,3 +34,4 @@ class Decision:
             print "DirBalle",DirBalle
             #mh.incrAngle(DirBalle[0],DirBalle[1])
         
+    
