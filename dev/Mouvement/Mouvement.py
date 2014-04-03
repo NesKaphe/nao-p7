@@ -98,10 +98,13 @@ print "fin"
 contient tout ce qui concerne la marche
 """
 
-class Marche :
+class Move :
 	def __init__(self,motion,posture):
 		self.motion = motion
 		self.posture = posture
 	
 	def marche(self):
-		motion.moveInit()
+		self.posture.goToPosture("Stand", 0.5)
+		self.motion.moveInit()
+	
+	

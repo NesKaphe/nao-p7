@@ -6,6 +6,7 @@ import numpy as np
 import os
 from Camera import Camera
 from naoqi import ALProxy
+from vision_definitions import *
 
 class FilterColor:
 	
@@ -15,6 +16,7 @@ class FilterColor:
 
 	def loadConfig(self):
 		#Peut etre changer ca en mettant le path dans un fichier de config
+		print os.getcwd()
 		fichier = open("./Data/colors.txt", "r")
 		
 		'''
@@ -26,6 +28,7 @@ class FilterColor:
 
 		#lecture du fichier
 		for ligne in fichier:
+			print ligne
 			#On retire le \n de fin de ligne
 			ligne = ligne.rstrip('\n')
 			params = ligne.split(', ')
@@ -45,13 +48,15 @@ class FilterColor:
 
 		if mini != None:
 			#Filtre de l'image en fonction de la couleur
+			imageHSV = cv2.blur(imageHSV,(10,10))
 			thresh = cv2.inRange(imageHSV,mini,maxi) 
 
 			#On va maintenant corriger quelques imperfection de l'image filtree
-			thresh = cv2.medianBlur(thresh,5)
+			thresh = cv2.medianBlur(thresh,15)
+			#thresh = cv2.blur(thresh,(10,10))
 			kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 			thresh = cv2.dilate(thresh,kernel,iterations=2)
-			thresh = cv2.erode(thresh,kernel,iterations=1)
+			#thresh = cv2.erode(thresh,kernel,iterations=1)
 			
 			return thresh
 		else:
@@ -70,9 +75,9 @@ class FilterColor:
 		
 		# Nao
 		videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
-		cam = Camera(videoProxy, "Calibrage")
+		cam = Camera(videoProxy, "Calibrage", resolution=kVGA)
 		#image = cam.getNewImage()
-		images = cam.getMultipleImages(5,0.1)
+		images = cam.getMultipleImages(20,0.1)
 		imageCourante = 0
 
 		# Webcam du pc pour les moments sans nao
@@ -87,7 +92,7 @@ class FilterColor:
 
 		#Ouverture du fichier 
 		fichier = open("./Data/colors.txt", "w+")
-
+	        #print os.getcwd()
 		print "===== Calibrage ====="
 		while boucle:
 			nom = raw_input("Nom de l'objet : ")
@@ -121,7 +126,7 @@ class FilterColor:
 				cv2.imshow("Original", images[imageCourante])
 				#On convertis le colorspace de l'image en HSV
 				imageHSV = cv2.cvtColor(images[imageCourante],cv2.COLOR_BGR2HSV)
-				if imageCourante >= 4:
+				if imageCourante >= 19:
 					imageCourante = 0
 				else:
 					imageCourante = imageCourante + 1
@@ -170,6 +175,7 @@ class FilterColor:
 				break;
 
 		#On recharge finalement les nouvelles configurations d'objets
+		fichier.close()
 		self.loadConfig()
 		cam.unsubscribe()
 	

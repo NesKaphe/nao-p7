@@ -7,6 +7,7 @@ import cv2
 import cv2.cv as cv
 import numpy as np
 import math
+from vision_definitions import *
 
 class Analyse:
 
@@ -15,14 +16,14 @@ class Analyse:
         self.videoProxy = videoProxy
 
         #On recupère l'interface avec la caméra du nao
-        self.camera = Camera(self.videoProxy, "Analyse")
+        self.camera = Camera(self.videoProxy, "Analyse", resolution=kVGA)
         #self.camera.subscribe()
 
         #On recupère notre filtre de couleurs
         self.filtre = FilterColor()
         
         #Pourcentage de ressemblance avec un cercle (detection de la balle)
-        self.pourcentage = 80
+        self.pourcentage = 70
 
     def createProxies(self):
         #A changer par des paramètres dans un fichier de config
@@ -99,6 +100,7 @@ class Analyse:
             
             centreX, centreY = self.getCentreImage()
             print (centreX,centreY)," et ", (posX,posY)
+	    '''
             if posX < centreX:
                 resX = 1
             else:
@@ -108,7 +110,9 @@ class Analyse:
                 resY = -1
             else:
                 resY = 1
-
+	    '''
+	    resX = posX - centreX
+	    resY = posY - centreY
             return resX, resY
         else:
             return None
