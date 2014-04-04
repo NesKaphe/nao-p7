@@ -16,7 +16,7 @@ class Analyse:
         self.videoProxy = videoProxy
 
         #On recupère l'interface avec la caméra du nao
-        self.camera = Camera(self.videoProxy, "Analyse", resolution=kVGA)
+        self.camera = Camera(self.videoProxy, "Analyse", camera=1,resolution=kVGA)
         #self.camera.subscribe()
 
         #On recupère notre filtre de couleurs
@@ -28,6 +28,10 @@ class Analyse:
     def createProxies(self):
         #A changer par des paramètres dans un fichier de config
         self.videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
+
+    
+    def switchCamera(self):
+	self.camera.switchCamera()
 
     '''
     getCentreImage: Retourne un couple (x,y) representant le point central de l'image
@@ -129,11 +133,18 @@ class Analyse:
 
 #filtre = FilterColor()
 #filtre.calibrage()
-"""
-analyse = Analyse()
+'''
+videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
+analyse = Analyse(videoProxy)
+i = 0
+
 while True:
     result = analyse.BallPosition()
     print result
     analyse.afficheImagesCourantes()
     cv2.waitKey(1)
-"""
+    i = i + 1
+    if i > 10:
+	analyse.camera.switchCamera()
+	i = 0
+'''
