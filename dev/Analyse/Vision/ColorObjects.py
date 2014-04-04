@@ -75,9 +75,10 @@ class FilterColor:
 		
 		# Nao
 		videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
-		cam = Camera(videoProxy, "Calibrage", resolution=kVGA)
+		cam = Camera(videoProxy, "Calibrage", camera=1, resolution=kVGA)
 		#image = cam.getNewImage()
-		images = cam.getMultipleImages(20,0.1)
+		print "Capture de quelques images pour le calibrage"
+		images = cam.getMultipleImages(10,0.1)
 		imageCourante = 0
 
 		# Webcam du pc pour les moments sans nao
@@ -126,7 +127,7 @@ class FilterColor:
 				cv2.imshow("Original", images[imageCourante])
 				#On convertis le colorspace de l'image en HSV
 				imageHSV = cv2.cvtColor(images[imageCourante],cv2.COLOR_BGR2HSV)
-				if imageCourante >= 19:
+				if imageCourante >= 9:
 					imageCourante = 0
 				else:
 					imageCourante = imageCourante + 1

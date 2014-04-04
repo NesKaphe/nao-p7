@@ -11,12 +11,12 @@ from vision_definitions import *
 
 class Analyse:
 
-    def __init__(self, videoProxy):
+    def __init__(self, videoProxy, camera=1):
         #
         self.videoProxy = videoProxy
 
         #On recupère l'interface avec la caméra du nao
-        self.camera = Camera(self.videoProxy, "Analyse", camera=1,resolution=kVGA)
+        self.camera = Camera(self.videoProxy, "Analyse", camera=cam,resolution=kVGA)
         #self.camera.subscribe()
 
         #On recupère notre filtre de couleurs
@@ -74,7 +74,7 @@ class Analyse:
         contours = cv2.findContours(self.imageFiltreCourante.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
 	if contours != None:
 		for i in contours:
-                    approx = cv2.approxPolyDP(i,0.05*cv2.arcLength(i,True),True)
+                    approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
                     (x,y),rayon = cv2.minEnclosingCircle(approx)
                     centre = (int(x),int(y))
                     rayon = int(rayon)
