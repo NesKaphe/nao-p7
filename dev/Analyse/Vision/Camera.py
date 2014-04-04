@@ -11,22 +11,36 @@ import numpy as np
 import time
 
 class Camera:
-
+	'''
+	Paramètres : 	proxy : un videoProxy pour le nao
+			moduleName : nom du module pour l'enregistrement des cameras
+			camera : 0 pour la camera du haut et 1 pour la camera du bas
+			resolution : kQQVGA : 160x120, kQVGA : 320x240, kVGA : 640x480
+				     k4VGA : 1280x960
+	'''
 	def __init__(self,proxy,moduleName,camera=0,resolution=kQVGA):
 		self.proxy = proxy
 		self.moduleName = moduleName
-		self.camera = camera
+		if camera < 0 or camera > 1:
+			self.camera = 0 #Par defaut on prendra la camera du haut
+		else:
+			self.camera = camera
 		self.resolution = resolution
 		self.subscribe()
 
+	'''
+	La destruction de l'objet camera entrainera la désinscription du module au nao
+	'''
 	def __del__(self):
 		self.unsubscribe()
 
+	
 	def subscribe(self):
 		self.proxy.subscribeCamera(self.moduleName, 
 					   self.camera, 
 					   self.resolution, 
 					   kBGRColorSpace, 30)
+
 
 	def unsubscribe(self):
 		try:
@@ -36,8 +50,21 @@ class Camera:
 			pass
 
 
+	def switchCamera(self):
+		self.unsubscribe()
+
+		if self.camera == 0:
+			self.camera = 1
+		else:
+			self.camera = 0
+
+		self.subscribe()
+
+
 	def getResolution(self):
-		if self.resolution == kQVGA:
+		if self.resolution == kQQVGA:
+			return 160, 120 
+		elif self.resolution == kQVGA:
 			return 320, 240
 		elif self.resolution == kVGA:
 			return 640, 480
@@ -47,7 +74,7 @@ class Camera:
 	'''
 	getNewImage: Prend une image de la caméra de nao puis retourne un Numpy array (Opencv)
 	'''
-	def getNewImage(self):
+	def getNewImage(self,cam=0):
 		#Demande une image au proxy
 		ImageNAO = self.proxy.getImageRemote(self.moduleName)
 		
