@@ -123,7 +123,7 @@ def get_one_img(id):
 			cv2.drawContours(im,approx,-1,cv.CV_RGB(0,255,0))
 	"""
 	
-	#TODO : manque des teste avec houghCircles
+	#TODO : manque des testes avec houghCircles
 	"""
 	circles = cv2.HoughCircles(thresh,cv.CV_HOUGH_GRADIENT,1,minDist,param1=50,param2=30,minRadius=0,maxRadius=0)
 	if circles != None:
@@ -427,7 +427,7 @@ def multiple_union_succ (imgs):
 	if len(imgs) <2 :
 		raise NameError("besoin d'au moins 2 images")
 	for i in range(len(imgs)-2) :
-			print "it :"i,"/",len(imgs)-2
+			print "it :",i,"/",len(imgs)-2
 			imxx,conts0,conts1 = union3(im_result,imgs[i+2][0])
 			if conts0 != [] :
 				cv2.drawContours(im_result,conts0,-1,(255,255,255),thickness=cv.CV_FILLED)
@@ -515,7 +515,7 @@ def main() :
 	
 	#reglages :
 	#pour faire des reglages rapides 
-	#(noter les valeurs hsv qui nous intéressent) ctrl+c pour sortir 
+	#(noter les valeurs hsv qui nous interessent) ctrl+c pour sortir 
 	"""
 	while True :
 		get_one_img(1)
@@ -536,7 +536,7 @@ def main() :
 	cv2.imshow("fusion !!! ", u)
 	"""
 	#teste d'unions multiples :
-	
+	"""
 	print "image 0?"
 	cv2.waitKey(0)#attendre l'utilisateur
 	img0 = get_one_img(0)
@@ -561,8 +561,8 @@ def main() :
 	cv2.imshow("img2 ", img2[0])
 	cv2.imshow("img3 ", img3[0])
 	cv2.imshow("multi fusion !!! ", mu)
-	
 	"""
+	
 	##############################################################
 	#ICI C'est le banc de teste :
 	#teste d'unions multiples succ
@@ -581,7 +581,7 @@ def main() :
 	
 	imgs = [img0,img1,img2,img3]
 	tps1 = time.clock()#calcul du temps
-	mu = multiple_union(imgs)#LE Coeur du code
+	mu = multiple_union_succ(imgs)#LE Coeur du code
 	tps2 = time.clock()#calcul du temps
 	print"temps mis par multiple_union :",(tps2 - tps1)
 		
@@ -592,7 +592,7 @@ def main() :
 	cv2.imshow("multi fusion !!! ", mu)
 	
 	#############################################################
-	"""
+	
 	cv2.waitKey(0)#fermer si il a y une touche appuye
 	cv2.destroyAllWindows()
 
