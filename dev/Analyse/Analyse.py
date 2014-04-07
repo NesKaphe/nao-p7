@@ -9,6 +9,7 @@ import numpy as np
 import math
 from vision_definitions import *
 
+
 class Analyse:
 
     def __init__(self, videoProxy, camera=1):
@@ -16,7 +17,7 @@ class Analyse:
         self.videoProxy = videoProxy
 
         #On recupère l'interface avec la caméra du nao
-        self.camera = Camera(self.videoProxy, "Analyse", camera=cam,resolution=kVGA)
+        self.camera = Camera(self.videoProxy, "Analyse", camera=camera,resolution=kVGA)
         #self.camera.subscribe()
 
         #On recupère notre filtre de couleurs
@@ -27,7 +28,7 @@ class Analyse:
 
     def createProxies(self):
         #A changer par des paramètres dans un fichier de config
-        self.videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
+        self.videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)#TODO utiliser Decision pour récupérer l'IP et port (ou autre fichier si changement)
 
     
     def switchCamera(self):

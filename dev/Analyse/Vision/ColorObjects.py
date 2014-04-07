@@ -46,7 +46,7 @@ class FilterColor:
 				maxi = np.array([objet[2],objet[4],objet[6]],np.uint8)
 				break
 
-		if mini != None:
+		if mini != None:#TODO or maxi ?
 			#Filtre de l'image en fonction de la couleur
 			imageHSV = cv2.blur(imageHSV,(10,10))
 			thresh = cv2.inRange(imageHSV,mini,maxi) 
@@ -159,7 +159,7 @@ class FilterColor:
 				if key == 113: #on quitte avec la touche q
 					break
 
-			#remplacer par une ecriture dans le fichier
+			#TODO remplacer par une ecriture dans le fichier
 			print "Data : ", nom, ", ", h1, ", ", h2, ", ", s1, ", ", s2, ", ", v1, ", ", v2 
 			ligne = str(nom) + ", " + str(h1) + ", " + str(h2) + ", " + str(s1) + ", " + str(s2) + ", " + str(v1) + ", " + str(v2) + "\n" 
 
