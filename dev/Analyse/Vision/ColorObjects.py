@@ -48,12 +48,13 @@ class FilterColor:
 
 		if mini != None:#TODO or maxi ?
 			#Filtre de l'image en fonction de la couleur
+			imageHSV = cv2.medianBlur(imageHSV,15)
 			imageHSV = cv2.blur(imageHSV,(10,10))
 			thresh = cv2.inRange(imageHSV,mini,maxi) 
 
 			#On va maintenant corriger quelques imperfection de l'image filtree
-			thresh = cv2.medianBlur(thresh,15)
-			#thresh = cv2.blur(thresh,(10,10))
+			#thresh = cv2.medianBlur(thresh,15)#TODO à retirer
+			#thresh = cv2.blur(thresh,(10,10))#TODO à retirer
 			kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 			thresh = cv2.dilate(thresh,kernel,iterations=2)
 			#thresh = cv2.erode(thresh,kernel,iterations=1)
