@@ -10,7 +10,7 @@ import numpy as np
 import math
 from vision_definitions import *
 
-
+"""
 class Analyse:
 
     def __init__(self, videoProxy, camera=1):
@@ -38,31 +38,31 @@ class Analyse:
     def switchCamera(self):
 		self.camera.switchCamera()
 
-    '''
+    #''
     getCentreImage: Retourne un couple (x,y) representant le point central de l'image
     capturée par la caméra du Nao
-    '''
+    #''
     def getCentreImage(self):
         resX, resY = self.camera.getResolution()
         centreX = resX / 2
         centreY = resY / 2
         return centreX, centreY
 
-    '''
+    #''
     calculPourcentage: Calcule un pourcentage de remplissage de l'objet par rapport a son cercle
     circonscrit
-    '''
+    #''
     #A changer pour une meilleure précision
     def calculPourcentage(self, rayon, contour):
         aire_objet = cv2.contourArea(contour)
         aire_cercle = math.pi*rayon*rayon
         return (aire_objet/aire_cercle)*100
 
-    '''
+    #''
     ChercheBalles: Va chercher tous les objets ressemblant à une balle dans une image
     capturée par la caméra du Nao et renvoie une liste de la forme (centre, rayon)
     -centre est un couple de la forme (x,y)
-    '''
+    #''
     #Renvoie une liste de la forme : (centre,rayon)
     def ChercheBalles(self):
         #On commence par recuperer une image venant de nao
@@ -89,11 +89,11 @@ class Analyse:
 
         return liste
   
-    """
+    #""
 	ChercheBallesV2(self):
 	version 2 avec plusieurs images
 	utilisation de la fonction union et multiunion
-	"""
+	#""
     def ChercheBallesV2(self):
         #On commence par recuperer une image venant de nao
         self.imgs = self.camera.getMultipleImages(nbImages= 3,pauseCapture = 50)
@@ -126,12 +126,12 @@ class Analyse:
         return liste
         
         
-    '''
+    #''
     BallPosition: Va retourner :
     - Un vecteur de direction par rapport au centre de l'image vers l'objet ayant le plus 
     de ressemblance avec une Balle (Si au moins une balle est detectée)
     - None si aucune balle n'a été trouvée dans l'image
-    '''
+    #''
     def BallPosition(self):
         listeBalles = self.ChercheBalles()
         if len(listeBalles) > 0:
@@ -156,9 +156,9 @@ class Analyse:
 
 
 
-    '''
+    #''
     afficheImagesCourantes: Permet d'afficher l'image courante traitée par l'analyse à l'écran
-    '''
+    #''
     def afficheImagesCourantes(self):
         cv2.imshow("Original",self.imageCourante)
         cv2.imshow("Filtre",self.imageFiltreCourante)
@@ -167,6 +167,15 @@ class Analyse:
 
 	def AnalyseImg(zone=None,forme=None)#va contenir la nouvelle version
 		pass
+"""
+
+class zone():
+	def __init__(self,(x,y),delta) :
+		self.(x,y) = (x,y)
+		self.delta = delta
+
+
+z = zone((1,2),62)
 
 #========Zone de test à effacer===========
 """

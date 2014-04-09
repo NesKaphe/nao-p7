@@ -7,6 +7,19 @@ import time
 import math
 
 """
+class zone coordonées x,y plus la
+"""
+class Zone():
+	def __init__(self,(x,y),dx,dy=None) :
+		self.x,self.y = (x,y)
+		self.delta = delta
+
+	def __str__(self):
+		return "("+str(self.x)+","+str(self.y)+"),"+str(self.delta)
+
+		
+
+"""
 createEmptyThresh (shape):
 permet de creer une image thresh de la bonne dimension
 """
@@ -177,6 +190,11 @@ def multipleUnionSucc (imgs):
 	return im_result
 
 
+#########NOUVELLES fonctonctions
 
-def detectZone ():
+
+	
+
+
+def detectZone (thresh,zone,):
 	pass
