@@ -153,8 +153,7 @@ class Analyse:
             return None
 
 
-	AnalyseImg(zone=None,forme=None)#va contenir la nouvelle version
-		pass
+
 
 
     '''
@@ -164,6 +163,10 @@ class Analyse:
         cv2.imshow("Original",self.imageCourante)
         cv2.imshow("Filtre",self.imageFiltreCourante)
         cv2.waitKey(1)
+
+
+	def AnalyseImg(zone=None,forme=None)#va contenir la nouvelle version
+		pass
 
 #========Zone de test à effacer===========
 """

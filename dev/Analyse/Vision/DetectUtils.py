@@ -1,0 +1,182 @@
+# -*- coding: utf-8 -*-
+#problème j'ai oublier de mettre ça donc il n'y a pas d'accent dans le code
+import cv2
+import cv2.cv as cv
+import numpy as np
+import time
+import math
+
+"""
+createEmptyThresh (shape):
+permet de creer une image thresh de la bonne dimension
+"""
+def createEmptyThresh (shape):
+	return np.zeros(shape,dtype=np.uint8) #thresh de la bonne taille et vide (noir ou plein de zeros partout)
+
+
+"""
+vide(img_th):
+renvoi si le threch est vide ou non (il y au moins un pixel blanc)
+"""
+def vide(img_th):
+	return not(img_th.any())
+
+
+"""
+isInlist(l,element) :
+savoir si un element est dans la liste
+"""
+def isInlist(l,element) :
+	for e in l :
+		if e == element :
+			return True
+	return False
+
+
+
+"""
+union(img_th0,img_th1):
+recupere 2 images thresh les compares en gardant tout les elements qui ont une intersection
+retourne une image thresh avec les résultats des comparaisons
+"""
+def union(img_th0,img_th1):	
+	if img_th0.shape != img_th1.shape :
+		raise NameError("les threshs n'ont pas la meme dimension")
+	conts0,h0 = cv2.findContours(img_th0.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)#contours img	1
+	conts1,h1 = cv2.findContours(img_th1.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)# // 			2
+	im_result = createEmptyThresh(img_th0.shape)#l'image thresh de resulat
+	l_result0 = []#liste des numeros de contours0 (conts0) qui va premttre d'itentifier si le contours est deja pris en compte pour l'union
+	l_result1 = []#liste des numeros de contours1 (conts1) qui va premttre d'itentifier si le contours est deja pris en compte pour l'union	
+	l_des0 = []#liste contenant les different dessins des contours 	0
+	l_des1 = []#			//										1
+	if (conts0 is None) or (conts1 is None) :
+		print "absolument aucun contours a comparer"
+	else :#on dessine tout les contours 1 par 1:
+		for i,c0 in enumerate(conts0) :
+			#on dessine dans un thresh le contours :
+			des0 = createEmptyThresh(img_th0.shape)#dessin du contour 0
+			cv2.drawContours(des0,[c0],-1,(255,255,255),thickness=cv.CV_FILLED)
+			l_des0.append(des0)			
+		for j,c1 in enumerate(conts1) :
+			#on dessine dans un thresh le contours :
+			des1 = createEmptyThresh(img_th0.shape)#dessin du contour 0
+			cv2.drawContours(des1,[c1],-1,(255,255,255),thickness=cv.CV_FILLED)
+			l_des1.append(des1)
+	#recherche d'intersections :
+	for i,(des0,c0) in enumerate(zip(l_des0,conts0)) :
+			for j,(des1,c1) in enumerate(zip(l_des1,conts1)) :
+				inter = cv2.bitwise_and(des0,des1)#on dessine l'intersection			
+				if not vide(inter) :#si il y a intersection
+					#on ajoute a la liste des contours valides
+					if not isInlist(l_result0,i) :
+						l_result0.append(i)
+					if not isInlist(l_result1,j) :
+						l_result1.append(j)
+					#on dessine directement le resultat :
+					cv2.drawContours(im_result,[c0],-1,(0,255,255),thickness=cv.CV_FILLED)#dessin du contours 0#version avec couleur
+					cv2.drawContours(im_result,[c1],-1,(0,0,255),thickness=cv.CV_FILLED)#dessin du contours 1#version avec couleur				
+	return 	im_result
+	
+	
+"""
+unionV2(img_th0,img_th1):
+version pour multiple_union() et autre du meme type
+retourne que les contours
+"""
+def unionV2(img_th0,img_th1):	
+	conts0,h0 = cv2.findContours(img_th0.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)#contours img	1
+	conts1,h1 = cv2.findContours(img_th1.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)# // 			2
+	l_result0 = []#liste des numeros de contours0 (conts0) qui va premttre d'itentifier si le contours est deja pris en compte pour l'union
+	l_result1 = []#liste des numeros de contours1 (conts1) qui va premttre d'itentifier si le contours est deja pris en compte pour l'union
+	conts_result0 =[]#va contenir la liste de tout les contours 0
+	conts_result1 =[]#				//							1	
+	l_des0 = []#liste contenant les different dessins des contours 	0
+	l_des1 = []#			//										1
+	if (conts0 is None) or (conts1 is None) :
+		print "absolument aucun contours a comparer"
+		pass 
+	else :#on dessine tout les contours 1 par 1:
+		for i,c0 in enumerate(conts0) :
+			#on dessine dans un thresh le contours :
+			des0 = createEmptyThresh(img_th0.shape)#dessin du contour 0
+			cv2.drawContours(des0,[c0],-1,(255,255,255),thickness=cv.CV_FILLED)
+			l_des0.append(des0)			
+		for j,c1 in enumerate(conts1) :
+			#on dessine dans un thresh le contours :
+			des1 = createEmptyThresh(img_th0.shape)#dessin du contour 0
+			cv2.drawContours(des1,[c1],-1,(255,255,255),thickness=cv.CV_FILLED)
+			l_des1.append(des1)
+	#recherche d'intersections :
+	for i,(des0,c0) in enumerate(zip(l_des0,conts0)) :
+			for j,(des1,c1) in enumerate(zip(l_des1,conts1)) :
+				inter = cv2.bitwise_and(des0,des1)#on dessine l'intersection			
+				if not vide(inter) :#si il y a intersection
+					#on ajoute a la liste des contours valides
+					if not isInlist(l_result0,i) :
+						l_result0.append(i)
+						conts_result0.append(c0)
+					if not isInlist(l_result1,j) :
+						l_result1.append(j)
+						conts_result1.append(c1)					
+	return 	conts_result0,conts_result1
+
+
+"""
+multipleUnion (imgs):
+parametre :
+imgs = une liste d'images thresh
+calcul absolument toute les unions possibles
+##attention performance faible de plus en plus faible si il à trop d'image
+"""
+def multipleUnion (imgs):
+	if len(imgs) <2 :
+		raise NameError("besoin d'au moins 2 images")	
+	im_result = createEmptyThresh(imgs[0].shape)#l'image thresh de resulat	
+	cpt = 0#compteur d'itteration
+	nb_tr = len(imgs)*len(imgs)#nb traitements	
+	for i,img0 in enumerate(imgs) :
+		for j,img1 in enumerate(imgs) :
+			cpt = cpt + 1
+			print "traitement :",cpt,"/",nb_tr#info dev : message pour connaitre l'avancee
+			if i != j : #on ne se compare pas soit meme
+				conts0,conts1 = unionV2(img0[0],img1[0])
+				if conts0 != [] :
+					cv2.drawContours(im_result,conts0,-1,(255,255,255),thickness=cv.CV_FILLED)
+				if conts1 !=[] :
+					cv2.drawContours(im_result,conts1,-1,(255,255,255),thickness=cv.CV_FILLED)					
+	return im_result
+
+
+"""
+multipleUnionSucc (imgs):
+autre vesion qui transmet a son successeur l'image avec les unions
+avantage : cette version est linéaire alors 
+inconvénient : risque de perdre des donnees
+"""
+def multipleUnionSucc (imgs):
+	if len(imgs) <2 :
+		raise NameError("besoin d'au moins 2 images")		
+	im_result = createEmptyThresh(imgs[0].shape)#va contenir le thresh resultant
+	c0,c1 = unionV2(imgs[0][0],imgs[1][0])	
+	if len(imgs) <2 :
+		raise NameError("besoin d'au moins 2 images")
+	for i in range(1,len(imgs)) :
+		print "traitement :",i,"/",len(imgs)#info dev : message pour connaitre l'avancee
+		conts0 =[]
+		conts1 =[]
+		#pour la premiere iterration on fait l'union des premieres images :
+		if i == 1 :
+			conts0,conts1 = unionV2(imgs[0][0],imgs[1][0])
+		else:
+			conts0,conts1 = unionV2(im_result,imgs[i][0])		
+		if conts0 != [] :
+			cv2.drawContours(im_result,conts0,-1,(255,255,255),thickness=cv.CV_FILLED)
+		if conts1 !=[] :
+			cv2.drawContours(im_result,conts1,-1,(255,255,255),thickness=cv.CV_FILLED)
+
+	return im_result
+
+
+
+def detectZone ():
+	pass
