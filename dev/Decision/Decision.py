@@ -99,8 +99,11 @@ class Decision:
             (self.motion.getAngles("HeadPitch",True)[0]*180.0)/math.pi," Yaw :",\
             (self.motion.getAngles("HeadYaw",True)[0]*180.0)/math.pi
         #mo.aCroupris()
-<<<<<<< HEAD
+
+
 	"""
+	#princilament une recherche plus que du code  :
+	
 	def TrackingBalle(self,center=True):
 		#le robot va chercher la balle si center est true on là centre dans l'image sinon stop la tete dès que on trouve
 		pass#voir routine 2
@@ -133,6 +136,4 @@ class Decision:
 				#touner sur lui même jusqu'à avoir la balle situé dans la bonne vertical
 	"""
 
-=======
->>>>>>> a92872a85036ef388bfe646ce444252b3097b94d
     
