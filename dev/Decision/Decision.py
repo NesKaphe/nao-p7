@@ -21,6 +21,8 @@ class Decision:
         self.posture = ALProxy("ALRobotPosture", self.IP , self.PORT)
         self.videoProxy = ALProxy("ALVideoDevice", self.IP, self.PORT)
         #self.rootine()
+
+        #self.marcheVersBalle()
         self.routine2()
 
     def rootine (self):
@@ -48,6 +50,36 @@ class Decision:
                 mh.incrAnglesTo(x,0.0)
                 #time.sleep(1)
             #mh.incrAngle(DirBalle[0],DirBalle[1])
+        
+
+    def marcheVersBalle(self):
+        self.posture.goToPosture("Stand",0.5)
+        a = Analyse(self.videoProxy, cam=1)
+       #a.filtre.calibrage()
+        self.motion.moveInit()
+        #print "j'attends 10 secondes que tu deplaces la balle devant moi"
+        #time.sleep(10)
+        if a.BallPosition() is not None: #On reporte le probleme de dectection a plus tard
+            print "Non, je vois deja la balle"
+            a.afficheImagesCourantes()
+            while True:
+                key = cv2.waitKey(33)
+                key -= 0x100000
+                if key == 113: #on quitte avec la touche q
+                    break
+        else:
+            self.motion.moveToward(1,0,0) #marche vers l'avant
+            while a.BallPosition() == None:
+                a.afficheImagesCourantes()
+                time.sleep(0.5)
+            self.motion.stopMove() #On arrete le mouvement
+            print "Je vois la balle"
+            a.afficheImagesCourantes()
+            while True:
+                key = cv2.waitKey(33)
+                key -= 0x100000
+                if key == 113: #on quitte avec la touche q
+                    break
 
     
     def routine2(self):
@@ -67,6 +99,7 @@ class Decision:
             (self.motion.getAngles("HeadPitch",True)[0]*180.0)/math.pi," Yaw :",\
             (self.motion.getAngles("HeadYaw",True)[0]*180.0)/math.pi
         #mo.aCroupris()
+<<<<<<< HEAD
 	"""
 	def TrackingBalle(self,center=True):
 		#le robot va chercher la balle si center est true on là centre dans l'image sinon stop la tete dès que on trouve
@@ -100,4 +133,6 @@ class Decision:
 				#touner sur lui même jusqu'à avoir la balle situé dans la bonne vertical
 	"""
 
+=======
+>>>>>>> a92872a85036ef388bfe646ce444252b3097b94d
     

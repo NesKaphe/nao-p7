@@ -88,14 +88,7 @@ class Analyse:
 		                    liste.append(((centre,rayon), pourcent))
 
         return liste
-        
-        
-        
-
-
-
- 
-        
+  
     """
 	ChercheBallesV2(self):
 	version 2 avec plusieurs images
@@ -133,16 +126,6 @@ class Analyse:
         return liste
         
         
-        
-
-
-
-
-
-
-
-
-        
     '''
     BallPosition: Va retourner :
     - Un vecteur de direction par rapport au centre de l'image vers l'objet ayant le plus 
@@ -162,24 +145,18 @@ class Analyse:
             posY = meilleure[0][0][1]
             
             centreX, centreY = self.getCentreImage()
-            print (centreX,centreY)," et ", (posX,posY)
-	    '''
-            if posX < centreX:
-                resX = 1
-            else:
-                resX = -1
-
-            if posY < centreY:
-                resY = -1
-            else:
-                resY = 1
-	    '''
+            print "La balle est a la position : ",(posX,posY), "de l'image"
 	    resX = posX - centreX
 	    resY = posY - centreY
             return resX, resY
         else:
             return None
-    
+
+
+	AnalyseImg(zone=None,forme=None)#va contenir la nouvelle version
+		pass
+
+
     '''
     afficheImagesCourantes: Permet d'afficher l'image courante traitée par l'analyse à l'écran
     '''
@@ -189,10 +166,10 @@ class Analyse:
         cv2.waitKey(1)
 
 #========Zone de test à effacer===========
+"""
+filtre = FilterColor()
+filtre.calibrage()
 
-#filtre = FilterColor()
-#filtre.calibrage()
-'''
 videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
 analyse = Analyse(videoProxy)
 i = 0
