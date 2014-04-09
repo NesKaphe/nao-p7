@@ -12,6 +12,7 @@ import numpy as np
 import time
 import almath
 import math#contien pi
+import a_croupis
 
 
 IP = "192.168.1.3"
@@ -41,7 +42,9 @@ class Head:
 		self.motion.angleInterpolation(names, angles, times, isAbsolute)
 		#ici voir si il y a besion de relacher le stiffnesse
 		print "mouvement tete - fini"		
-
+	
+	def tension (self,t):
+		self.motion.setStiffnesses("Head", t)	
 
 	def incrAnglesTo(self,angleYaw,anglePitch,speedX=1.5,speedY=1.5) :#va donner les angles directement a la tête (angle en radian)
 		self.motion.setStiffnesses("Head", 1.0)
@@ -121,8 +124,15 @@ class Move :
 		self.motion = motion
 		self.posture = posture
 	
-	def marche(self):
+	def debout(self):
 		self.posture.goToPosture("Stand", 0.5)
-		self.motion.moveInit()
+		#self.motion.moveInit()	
+
+	def marche(self):
+		self.debout()
+		pass
+		
+	def aCroupris(self):
+		a_croupis.move(self.motion)
 	
 	

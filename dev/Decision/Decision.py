@@ -21,12 +21,14 @@ class Decision:
         self.posture = ALProxy("ALRobotPosture", self.IP , self.PORT)
         self.videoProxy = ALProxy("ALVideoDevice", self.IP, self.PORT)
         #self.rootine()
-        self.marcheVersBalle()
-        
+
+        #self.marcheVersBalle()
+        self.routine2()
+
     def rootine (self):
         #phase de calibrage
         a = Analyse(self.videoProxy)
-        #a.filtre.calibrage()
+        a.filtre.calibrage()
         
         angle_vision = (60*math.pi)/180 #angle de vision en radian
         px_vision = 640     
@@ -37,7 +39,7 @@ class Decision:
         mh.reset()
         while True :
             DirBalle = a.BallPosition()
-            #a.afficheImagesCourantes()
+            a.afficheImagesCourantes()
             print "angle reel",(self.motion.getAngles("HeadYaw",True)[0]*180.0)/math.pi#," , ",self.motion.getAngles("HeadPitch",True)
             #print "DirBalle",DirBalle
             
@@ -78,4 +80,21 @@ class Decision:
                 key -= 0x100000
                 if key == 113: #on quitte avec la touche q
                     break
+
+    
+    def routine2(self):
+        mh = Head(self.motion,self.posture)
+        mo = Move(self.motion,self.posture)
+        a = Analyse(self.videoProxy,camera=1)
+        #a.filtre.calibrage()
+
+        mo.debout()
+
+        mh.tension(0.0)
+
+        while True :
+            DirBalle = a.BallPosition()
+            a.afficheImagesCourantes()
+            print "angle reel Pitch",(self.motion.getAngles("HeadPitch",True)[0]*180.0)/math.pi," Yaw :",(self.motion.getAngles("HeadYaw",True)[0]*180.0)/math.pi
+        #mo.aCroupris()
     

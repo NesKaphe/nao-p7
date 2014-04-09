@@ -62,6 +62,8 @@ while True:
 	kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 	thresh = cv2.dilate(thresh,kernel,iterations=2)
 	thresh = cv2.erode(thresh,kernel,iterations=1)
+	
+	print "type thresh :",type(thresh),"  shape : ",thresh.shape#info dev
 
 	contours = cv2.findContours(thresh.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
 	if contours != None:
