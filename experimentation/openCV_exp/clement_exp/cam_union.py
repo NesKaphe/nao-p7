@@ -22,8 +22,9 @@ def init_thresh_vide ():
 	global im
 	global thresh_vide
 	if im is not None :
-		thresh_vide = np.zeros(im.shape,dtype=np.uint8) #thresh de la bonne taille et vide (noir ou plein de zeros partout)
-	
+		#thresh_vide = np.zeros(im.shape,dtype=np.uint8) #thresh de la bonne taille et vide (noir ou plein de zeros partout)
+		thresh_vide = np.zeros((im.shape[0], im.shape[1]),dtype=np.uint8) #thresh de la bonne taille et vide (noir ou plein de zeros partout)
+
 
 
 
@@ -99,7 +100,6 @@ def get_one_img(id):
 	#######################################################
 		
 	thresh = cv2.inRange(im2,mini,maxi)
-
 	kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 	thresh = cv2.dilate(thresh,kernel,iterations=2)
 	thresh = cv2.erode(thresh,kernel,iterations=1)
@@ -362,6 +362,7 @@ def union3(img_th0,img_th1):#version pour multicontours ne retourne que les cont
 			l_des1.append(des1)
 
 	#recherche d'intersections :
+	p
 	for i,(des0,c0) in enumerate(zip(l_des0,conts0)) :
 			for j,(des1,c1) in enumerate(zip(l_des1,conts1)) :
 				inter = cv2.bitwise_and(des0,des1)#on dessine l'intersection
@@ -420,21 +421,28 @@ autre vesion qui transmet a son successeur l'image avec les unions (attention ri
 def multiple_union_succ (imgs):
 
 	global thresh_vide
+	im_result = thresh_vide.copy()#va contenir le thresh resultant
 	
-	#pour la premiere iterration on fait l'union des premieres images
 	c0,c1 = union3(imgs[0][0],imgs[1][0])
 	
 	if len(imgs) <2 :
 		raise NameError("besoin d'au moins 2 images")
-	for i in range(len(imgs)-2) :
-			print "it :",i,"/",len(imgs)-2
-			imxx,conts0,conts1 = union3(im_result,imgs[i+2][0])
-			if conts0 != [] :
-				cv2.drawContours(im_result,conts0,-1,(255,255,255),thickness=cv.CV_FILLED)
-			if conts1 !=[] :
-				cv2.drawContours(im_result,conts1,-1,(255,255,255),thickness=cv.CV_FILLED)
+	for i in range(1,len(imgs)) :
+		print "it :",i,"/",len(imgs)
+		
+		conts0 =[]
+		conts1 =[]
+		#pour la premiere iterration on fait l'union des premieres images :
+		if i == 1 :
+			conts0,conts1 = union3(imgs[0][0],imgs[1][0])
+		else:
+			conts0,conts1 = union3(im_result,imgs[i][0])
+		
+		if conts0 != [] :
+			cv2.drawContours(im_result,conts0,-1,(255,255,255),thickness=cv.CV_FILLED)
+		if conts1 !=[] :
+			cv2.drawContours(im_result,conts1,-1,(255,255,255),thickness=cv.CV_FILLED)
 
-					
 	return im_result
 
 
@@ -536,7 +544,7 @@ def main() :
 	cv2.imshow("fusion !!! ", u)
 	"""
 	#teste d'unions multiples :
-	"""
+	
 	print "image 0?"
 	cv2.waitKey(0)#attendre l'utilisateur
 	img0 = get_one_img(0)
@@ -561,8 +569,8 @@ def main() :
 	cv2.imshow("img2 ", img2[0])
 	cv2.imshow("img3 ", img3[0])
 	cv2.imshow("multi fusion !!! ", mu)
-	"""
 	
+	"""
 	##############################################################
 	#ICI C'est le banc de teste :
 	#teste d'unions multiples succ
@@ -590,7 +598,7 @@ def main() :
 	cv2.imshow("img2 ", img2[0])
 	cv2.imshow("img3 ", img3[0])
 	cv2.imshow("multi fusion !!! ", mu)
-	
+	"""
 	#############################################################
 	
 	cv2.waitKey(0)#fermer si il a y une touche appuye

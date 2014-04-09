@@ -36,7 +36,8 @@ class FilterColor:
 
 		fichier.close()
 
-
+	#TODO : faire un commentaire
+	#retourne un image thresh a partir d'une image HSV
 	def filtrer(self, imageHSV, nomObjet):
 		mini = None
 		maxi = None
@@ -66,7 +67,21 @@ class FilterColor:
 	''' Peut etre inutile
 	'''
 	def multipleFilter(self, listeImagesHSV, nomObjet):
-		pass
+		imgsFiltre = []
+		for img in listeImageHSV :
+			imgsFiltre.append(self.filtrer(img,nomObjet))
+		return imgsFiltre
+			
+	'''
+	multiHSVConvert :
+	prend une liste d'images et retourne 
+	une liste de c'elle si convertis en HSV
+	'''
+	def multiHSVConvert(self,listImgs):
+		imgsHSV = []
+		for imgs in listImgs :
+			imgsHSV.append(cv2.cvtColor(imgs, cv2.COLOR_BGR2HSV))
+		return imgsHSV
 
 	''' va afficher la fenetre pour calibrer les couleurs + interaction avec la console pour
 	faire plusieurs enregistrements

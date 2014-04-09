@@ -2,6 +2,7 @@
 #from Vision import Camera
 from naoqi import ALProxy
 from Vision.Camera import Camera
+from Vision import DetectUtils
 from Vision.ColorObjects import FilterColor
 import cv2
 import cv2.cv as cv
@@ -25,6 +26,9 @@ class Analyse:
         
         #Pourcentage de ressemblance avec un cercle (detection de la balle)
         self.pourcentage = 70
+        
+        #nom du filtre de la balle
+        self.bfname = "Balle"#balle filtrer name#TODO trouver un moyen de directement le recuperer dans le fichier
 
     def createProxies(self):
         #A changer par des paramètres dans un fichier de config
@@ -32,7 +36,7 @@ class Analyse:
 
     
     def switchCamera(self):
-	self.camera.switchCamera()
+		self.camera.switchCamera()
 
     '''
     getCentreImage: Retourne un couple (x,y) representant le point central de l'image
@@ -69,22 +73,76 @@ class Analyse:
 
         #On demande a notre filtre de filtrer l'image pour la balle
         #Changer le parametre nom de balle avec un fichier de config (a faire)
-        self.imageFiltreCourante = self.filtre.filtrer(imageHSV, "Balle")
+        self.imageFiltreCourante = self.filtre.filtrer(imageHSV, self.bfname)
 
         liste = []
         contours = cv2.findContours(self.imageFiltreCourante.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
-	if contours != None:
-		for i in contours:
-                    approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
-                    (x,y),rayon = cv2.minEnclosingCircle(approx)
-                    centre = (int(x),int(y))
-                    rayon = int(rayon)
-                    pourcent = self.calculPourcentage(rayon,i)
-                    if pourcent > self.pourcentage:
-                        liste.append(((centre,rayon), pourcent))
+		if contours != None:
+			for i in contours:imageFiltreCourante
+		                approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
+		                (x,y),rayon = cv2.minEnclosingCircle(approx)
+		                centre = (int(x),int(y))
+		                rayon = int(rayon)
+		                pourcent = self.calculPourcentage(rayon,i)
+		                if pourcent > self.pourcentage:
+		                    liste.append(((centre,rayon), pourcent))
 
         return liste
+        
+        
+        
 
+
+
+ 
+        
+    """
+	ChercheBallesV2(self):
+	version 2 avec plusieurs images
+	utilisation de la fonction union et multiunion
+	"""
+    def ChercheBallesV2(self):
+        #On commence par recuperer une image venant de nao
+        self.imgs = self.camera.getMultipleImages(nbImages= 3,pauseCapture = 50)
+        
+        #On change de colorspace (BGR -> HSV)
+        self.imgsHSV = self.camera.multiHSVConvert(imgs)
+
+        #On demande a notre filtre de filtrer l'image pour la balle
+        #Changer le parametre nom de balle avec un fichier de config (a faire)
+        	
+        self.imgsFiltre = self.filtre.multipleFilter(self.imgsHSV, self.bfname)
+
+		mu = multipleUnion (imgsFiltre)#version 1 
+		#mus = multipleUnionSucc (imgsFiltre)#version 2 #TODO a tester 
+		contours = cv2.findContours(mu,cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
+        liste = []#liste des endroits ou est suppose se trouver la balle
+
+		if contours != None:
+			for i in contours:
+		                approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
+		                (x,y),rayon = cv2.minEnclosingCircle(approx)
+		                centre = (int(x),int(y))
+		                rayon = int(rayon)
+		                pourcent = self.calculPourcentage(rayon,i)
+		                if pourcent > self.pourcentage:
+		                    liste.append(((centre,rayon), pourcent))
+		#TODO -- faire une methode spécialement dédidé à la detection de contours
+		#réintroduire la detection avec HougthCircle
+
+        return liste
+        
+        
+        
+
+
+
+
+
+
+
+
+        
     '''
     BallPosition: Va retourner :
     - Un vecteur de direction par rapport au centre de l'image vers l'objet ayant le plus 

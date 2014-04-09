@@ -63,7 +63,41 @@ class Decision:
         while True :
             DirBalle = a.BallPosition()
             a.afficheImagesCourantes()
-            print "angle reel Pitch",(self.motion.getAngles("HeadPitch",True)[0]*180.0)/math.pi," Yaw :",(self.motion.getAngles("HeadYaw",True)[0]*180.0)/math.pi
+            print "angle reel Pitch",\
+            (self.motion.getAngles("HeadPitch",True)[0]*180.0)/math.pi," Yaw :",\
+            (self.motion.getAngles("HeadYaw",True)[0]*180.0)/math.pi
         #mo.aCroupris()
+	"""
+	def TrackingBalle(self,center=True):
+		#le robot va chercher la balle si center est true on là centre dans l'image sinon stop la tete dès que on trouve
+		pass#voir routine 2
+		#faire une version qui fixe l'angle pitch et faire touner le robot sur lui même
+		#si une position à ete valider plusieurs fois on la considère comme valide
+		
+		
+		
+	def modeRechercheBalle(self):
+		#tourner en rond sur lui meme jusqu'à trouver la balle
+		#reduire le pourcentage si on trouve pas 
+		#utilisation de redBall traking
+		#si on trouve toujours pas prendre le rouge pour cible
+		#si il a plusieurs balles prendre celle qui est plus à gauche
+		pass
+		
+	def modeAvanceVersBalle(self)
+		#tant que la balle n'est pas dans le champs de vision de la camera du bas
+		#si la balle est légèrement à gauche ou à droite calculer un angle pour une trajectoire en
+		#courbe
+		#faire un processus en tache de fond qui recherche la balle toutes les secondes (centré dans l'image)
+		#si la tête ne ce recentre pas automatiquement ou si la balle ne c'est pas raproché du centre
+		
+		pass
+		
+	def modePrendreBalle(self):
+		while ?? :
+			#detection vertical
+				#fixer le pitch
+				#touner sur lui même jusqu'à avoir la balle situé dans la bonne vertical
+	"""
 
     
