@@ -20,7 +20,8 @@ class Decision:
         self.motion = ALProxy("ALMotion", self.IP , self.PORT)
         self.posture = ALProxy("ALRobotPosture", self.IP , self.PORT)
         self.videoProxy = ALProxy("ALVideoDevice", self.IP, self.PORT)
-        self.rootine()
+        #self.rootine()
+        self.marcheVersBalle()
         
     def rootine (self):
         #phase de calibrage
@@ -48,4 +49,33 @@ class Decision:
                 #time.sleep(1)
             #mh.incrAngle(DirBalle[0],DirBalle[1])
         
+
+    def marcheVersBalle(self):
+        self.posture.goToPosture("Stand",0.5)
+        a = Analyse(self.videoProxy, cam=1)
+       #a.filtre.calibrage()
+        self.motion.moveInit()
+        #print "j'attends 10 secondes que tu deplaces la balle devant moi"
+        #time.sleep(10)
+        if a.BallPosition() is not None: #On reporte le probleme de dectection a plus tard
+            print "Non, je vois deja la balle"
+            a.afficheImagesCourantes()
+            while True:
+                key = cv2.waitKey(33)
+                key -= 0x100000
+                if key == 113: #on quitte avec la touche q
+                    break
+        else:
+            self.motion.moveToward(1,0,0) #marche vers l'avant
+            while a.BallPosition() == None:
+                a.afficheImagesCourantes()
+                time.sleep(0.5)
+            self.motion.stopMove() #On arrete le mouvement
+            print "Je vois la balle"
+            a.afficheImagesCourantes()
+            while True:
+                key = cv2.waitKey(33)
+                key -= 0x100000
+                if key == 113: #on quitte avec la touche q
+                    break
     
