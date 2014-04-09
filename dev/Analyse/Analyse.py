@@ -103,18 +103,7 @@ class Analyse:
             posY = meilleure[0][0][1]
             
             centreX, centreY = self.getCentreImage()
-            print (centreX,centreY)," et ", (posX,posY)
-	    '''
-            if posX < centreX:
-                resX = 1
-            else:
-                resX = -1
-
-            if posY < centreY:
-                resY = -1
-            else:
-                resY = 1
-	    '''
+            print "La balle est a la position : ",(posX,posY), "de l'image"
 	    resX = posX - centreX
 	    resY = posY - centreY
             return resX, resY
@@ -131,8 +120,8 @@ class Analyse:
 
 #========Zone de test à effacer===========
 
-#filtre = FilterColor()
-#filtre.calibrage()
+filtre = FilterColor()
+filtre.calibrage()
 '''
 videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
 analyse = Analyse(videoProxy)

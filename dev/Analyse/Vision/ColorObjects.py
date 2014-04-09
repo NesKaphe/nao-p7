@@ -7,6 +7,7 @@ import os
 from Camera import Camera
 from naoqi import ALProxy
 from vision_definitions import *
+import time
 
 class FilterColor:
 	
@@ -48,16 +49,17 @@ class FilterColor:
 
 		if mini != None:
 			#Filtre de l'image en fonction de la couleur
-			imageHSV = cv2.blur(imageHSV,(10,10))
+			#imageHSV = cv2.medianBlur(imageHSV,15)
+			#imageHSV = cv2.blur(imageHSV,(10,10))
 			thresh = cv2.inRange(imageHSV,mini,maxi) 
 
 			#On va maintenant corriger quelques imperfection de l'image filtree
 			thresh = cv2.medianBlur(thresh,15)
 			#thresh = cv2.blur(thresh,(10,10))
-			kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
-			thresh = cv2.dilate(thresh,kernel,iterations=2)
-			#thresh = cv2.erode(thresh,kernel,iterations=1)
-			
+			kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(10,10))
+			#thresh = cv2.dilate(thresh,kernel,iterations=4)
+			#thresh = cv2.erode(thresh,kernel,iterations=4)
+			thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
 			return thresh
 		else:
 			raise Exception('Filtre impossible [nomObjet incorrect]')
@@ -70,22 +72,27 @@ class FilterColor:
 	''' va afficher la fenetre pour calibrer les couleurs + interaction avec la console pour
 	faire plusieurs enregistrements
 	'''
-	def calibrage(self):
+	def calibrage(self): #TODO: permettre d'annuler avant de commencer le calibrage
 		boucle = True
 		
 		# Nao
+		'''
 		videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
 		cam = Camera(videoProxy, "Calibrage", camera=1, resolution=kVGA)
 		#image = cam.getNewImage()
 		print "Capture de quelques images pour le calibrage"
 		images = cam.getMultipleImages(10,0.1)
+		'''
 		imageCourante = 0
-
 		# Webcam du pc pour les moments sans nao
-		"""
+		
 		cap = cv2.VideoCapture(0)
-		ret, image = cap.read()
-		"""
+		images = []
+		i = 0
+		while i < 10:
+			images.append(cap.read()[1])
+			time.sleep(0.1)
+			i += 1
 		
 		#Callback pour les trackbar
 		def callback(x):
@@ -125,8 +132,17 @@ class FilterColor:
 			while True:
 				#On affiche la capture originale (Sinon, on fera sur video)
 				cv2.imshow("Original", images[imageCourante])
+
+				#sur video
+				#images = cap.read()[1]
+				#cv2.imshow("Original", images)
+
 				#On convertis le colorspace de l'image en HSV
 				imageHSV = cv2.cvtColor(images[imageCourante],cv2.COLOR_BGR2HSV)
+
+				#sur video
+				#imageHSV = cv2.cvtColor(images,cv2.COLOR_BGR2HSV)
+
 				if imageCourante >= 9:
 					imageCourante = 0
 				else:
@@ -142,12 +158,26 @@ class FilterColor:
 				mini = np.array([h1,s1,v1],np.uint8)
 				maxi = np.array([h2,s2,v2],np.uint8)
 				
+
+				#Filtre de l'image en fonction de la couleur
+				#imageHSV = cv2.medianBlur(imageHSV,15)
+				#imageHSV = cv2.blur(imageHSV,(10,10))
+				thresh = cv2.inRange(imageHSV,mini,maxi) 
+				
+			        #On va maintenant corriger quelques imperfection de l'image filtree
+				thresh = cv2.medianBlur(thresh,15)
+			        #thresh = cv2.blur(thresh,(10,10))
+				kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(10,10))
+				#thresh = cv2.dilate(thresh,kernel,iterations=4)
+				#thresh = cv2.erode(thresh,kernel,iterations=4)
+				thresh = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel)
+				'''
 				#On effectue maintenant les traitements de l'image
 				thresh = cv2.inRange(imageHSV,mini,maxi)
 				kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
 				thresh = cv2.dilate(thresh,kernel,iterations=2)
 				thresh = cv2.erode(thresh,kernel,iterations=1)
-				
+				'''
 				#Puis on affiche à l'écran l'image
 				cv2.imshow("Calibrage", thresh)
 
@@ -178,5 +208,5 @@ class FilterColor:
 		#On recharge finalement les nouvelles configurations d'objets
 		fichier.close()
 		self.loadConfig()
-		cam.unsubscribe()
+		#cam.unsubscribe()
 	
