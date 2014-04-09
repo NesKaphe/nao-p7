@@ -6,6 +6,17 @@ import numpy as np
 import time
 import math
 
+
+class Cercle:
+	def __init__(self, (x,y), rayon):
+		self.x = x
+		self.y = y
+		self.rayon = rayon
+
+	def __str__(self):
+		return "(("+str(self.x)+","+str(self.y)+"),"+str(self.rayon)+")"
+
+
 """
 class zone coordonées x,y plus la
 """
@@ -198,3 +209,26 @@ def multipleUnionSucc (imgs):
 
 def detectZone (thresh,zone,):
 	pass
+
+
+def calculPourcentage(rayon, contour):
+        aire_objet = cv2.contourArea(contour)
+        aire_cercle = math.pi*rayon*rayon
+        return (aire_objet/aire_cercle)*100
+
+
+def detectCercle(thresh, pourcentage):
+	contours = cv2.findContours(thresh.copy(),
+				    cv.CV_RETR_EXTERNAL,
+				    cv.CV_CHAIN_APPROX_NONE)[0]
+	if contours != None:
+		liste = []
+		for i in contours:
+			approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
+			(x,y),rayon = cv2.minEnclosingCircle(approx)
+			centre = (int(x),int(y))
+			rayon = int(rayon)
+			pourcent = calculPourcentage(rayon,i)
+			if pourcent > pourcentage:
+				cercle = Cercle(centre,rayon)
+				liste.append([cercle,pourcent])
