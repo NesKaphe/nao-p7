@@ -11,6 +11,7 @@ from Mouvement.Mouvement import *
 import math
 import almath
 import time
+from Analyse.Vision import DetectUtils as DU
 
 class Decision:
     def __init__(self):
@@ -29,7 +30,9 @@ class Decision:
 
         self.routine4()
 
-    def rootine (self):
+        self.routine3()
+
+    def routine (self):
         #phase de calibrage
         a = Analyse(self.videoProxy)
         a.filtre.calibrage()
@@ -86,7 +89,7 @@ class Decision:
                     break
 
     
-    def routine2(self):
+    def routine2(self):#teste pour tourner la tête au bon endroit
         mh = Head(self.motion,self.posture)
         mo = Move(self.motion,self.posture)
         a = Analyse(self.videoProxy,camera=1)
@@ -106,7 +109,6 @@ class Decision:
 
 
 
-
     def routine4(self):
         mh = Head(self.motion,self.posture)
         mo = Move(self.motion,self.posture)
@@ -122,39 +124,57 @@ class Decision:
                 print "cercle : ",cercle," : angle calculé =",(angle*180)/math.pi
                 mh.incrAnglesTo(angle,0.0)
 
-	"""
-	#princilament une recherche plus que du code  :
+
+    def routine3(self): #teste pour la nouvelle fonction d'analyseImg
+		a = Analyse(self.videoProxy,camera=1)
+		z = DU.Zone((200,200),200)
+		#a.filtre.calibrage()
+		while True:
+			cerclesZone = a.AnalyseImg(zone=z,cercle=70)
+			print "cercles = ",cerclesZone
+			a.afficheImagesCourantes()
+
+
+
+
+
+
+
+
+"""
+#princilament une recherche plus que du code  :
+
+def TrackingBalle(self,center=True):
+	#le robot va chercher la balle si center est true on là centre dans l'image sinon stop la tete dès que on trouve
+	pass#voir routine 2
+	#faire une version qui fixe l'angle pitch et faire touner le robot sur lui même
+	#si une position à ete valider plusieurs fois on la considère comme valide
 	
-	def TrackingBalle(self,center=True):
-		#le robot va chercher la balle si center est true on là centre dans l'image sinon stop la tete dès que on trouve
-		pass#voir routine 2
-		#faire une version qui fixe l'angle pitch et faire touner le robot sur lui même
-		#si une position à ete valider plusieurs fois on la considère comme valide
-		
-		
-		
-	def modeRechercheBalle(self):
-		#tourner en rond sur lui meme jusqu'à trouver la balle
-		#reduire le pourcentage si on trouve pas 
-		#utilisation de redBall traking
-		#si on trouve toujours pas prendre le rouge pour cible
-		#si il a plusieurs balles prendre celle qui est plus à gauche
-		pass
-		
-	def modeAvanceVersBalle(self)
-		#tant que la balle n'est pas dans le champs de vision de la camera du bas
-		#si la balle est légèrement à gauche ou à droite calculer un angle pour une trajectoire en
-		#courbe
-		#faire un processus en tache de fond qui recherche la balle toutes les secondes (centré dans l'image)
-		#si la tête ne ce recentre pas automatiquement ou si la balle ne c'est pas raproché du centre
-		
-		pass
-		
-	def modePrendreBalle(self):
-		while ?? :
-			#detection vertical
-				#fixer le pitch
-				#touner sur lui même jusqu'à avoir la balle situé dans la bonne vertical
-	"""
+	
+	
+def modeRechercheBalle(self):
+	#tourner en rond sur lui meme jusqu'à trouver la balle
+	#reduire le pourcentage si on trouve pas 
+	#utilisation de redBall traking
+	#si on trouve toujours pas prendre le rouge pour cible
+	#si il a plusieurs balles prendre celle qui est plus à gauche
+	pass
+	
+def modeAvanceVersBalle(self)
+	#tant que la balle n'est pas dans le champs de vision de la camera du bas
+	#si la balle est légèrement à gauche ou à droite calculer un angle pour une trajectoire en
+	#courbe
+	#faire un processus en tache de fond qui recherche la balle toutes les secondes (centré dans l'image)
+	#si la tête ne ce recentre pas automatiquement ou si la balle ne c'est pas raproché du centre
+	
+	pass
+>>>>>>> bfd1f724dc3710f54dafbd814a043afe5b55f5ea
+	
+def modePrendreBalle(self):
+	while ?? :
+		#detection vertical
+			#fixer le pitch
+			#touner sur lui même jusqu'à avoir la balle situé dans la bonne vertical
+"""
 
     
