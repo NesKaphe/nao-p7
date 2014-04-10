@@ -2,7 +2,7 @@
 #from Vision import Camera
 from naoqi import ALProxy
 from Vision.Camera import Camera
-from Vision import DetectUtils
+from Vision import DetectUtils as du
 from Vision.ColorObjects import FilterColor
 import cv2
 import cv2.cv as cv
@@ -12,7 +12,7 @@ from vision_definitions import *
 
 
 class Analyse:
-
+    
     def __init__(self, videoProxy, camera=1):
         #
         self.videoProxy = videoProxy
@@ -28,7 +28,7 @@ class Analyse:
         self.pourcentage = 70
         
         #nom du filtre de la balle
-        self.bfname = "Balle"#balle filtrer name#TODO trouver un moyen de directement le recuperer dans le fichier
+        self.bfname = "Balle"#balle filtrer name #TODO trouver un moyen de directement le recuperer dans le fichier
 
     def createProxies(self):
         #A changer par des paramètres dans un fichier de config
@@ -47,6 +47,11 @@ class Analyse:
         centreX = resX / 2
         centreY = resY / 2
         return centreX, centreY
+    
+
+    def getPxVision(self):
+        resolution = self.camera.getResolution()
+        return resolution
 
     '''
     calculPourcentage: Calcule un pourcentage de remplissage de l'objet par rapport a son cercle
@@ -77,15 +82,15 @@ class Analyse:
 
         liste = []
         contours = cv2.findContours(self.imageFiltreCourante.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
-		if contours != None:
-			for i in contours:imageFiltreCourante
-		                approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
-		                (x,y),rayon = cv2.minEnclosingCircle(approx)
-		                centre = (int(x),int(y))
-		                rayon = int(rayon)
-		                pourcent = self.calculPourcentage(rayon,i)
-		                if pourcent > self.pourcentage:
-		                    liste.append(((centre,rayon), pourcent))
+        if contours != None:
+            for i in contours:
+                approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
+                (x,y),rayon = cv2.minEnclosingCircle(approx)
+                centre = (int(x),int(y))
+                rayon = int(rayon)
+                pourcent = self.calculPourcentage(rayon,i)
+                if pourcent > self.pourcentage:
+                    liste.append(((centre,rayon), pourcent))
 
         return liste
   
@@ -106,20 +111,20 @@ class Analyse:
         	
         self.imgsFiltre = self.filtre.multipleFilter(self.imgsHSV, self.bfname)
 
-		mu = multipleUnion (imgsFiltre)#version 1 
+        mu = multipleUnion (imgsFiltre)#version 1 
 		#mus = multipleUnionSucc (imgsFiltre)#version 2 #TODO a tester 
-		contours = cv2.findContours(mu,cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
+        contours = cv2.findContours(mu,cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
         liste = []#liste des endroits ou est suppose se trouver la balle
 
-		if contours != None:
-			for i in contours:
-		                approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
-		                (x,y),rayon = cv2.minEnclosingCircle(approx)
-		                centre = (int(x),int(y))
-		                rayon = int(rayon)
-		                pourcent = self.calculPourcentage(rayon,i)
-		                if pourcent > self.pourcentage:
-		                    liste.append(((centre,rayon), pourcent))
+        if contours != None:
+            for i in contours:
+                approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
+                (x,y),rayon = cv2.minEnclosingCircle(approx)
+                centre = (int(x),int(y))
+                rayon = int(rayon)
+                pourcent = self.calculPourcentage(rayon,i)
+                if pourcent > self.pourcentage:
+                    liste.append(((centre,rayon), pourcent))
 		#TODO -- faire une methode spécialement dédidé à la detection de contours
 		#réintroduire la detection avec HougthCircle
 
@@ -165,8 +170,32 @@ class Analyse:
         cv2.waitKey(1)
 
 
-	def AnalyseImg(zone=None,forme=None)#va contenir la nouvelle version
-		pass
+    def AnalyseImg(self,zone=None,forme=None):#va contenir la nouvelle version
+        #On commence par recuperer une image venant de nao
+        self.imageCourante = self.camera.getNewImage()
+
+        #On change de colorspace (BGR -> HSV)
+        imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)
+
+        #Filtrage de l'image
+        imageFiltre = self.filtre.filtrer(imageHSV, self.bfname)
+
+        #On recherche les cercles
+        cercles = du.detecteCercle(imageFiltre,self.pourcentage)
+
+        cercle = du.meilleureBalle(cercles)
+
+        return cercle
+
+    def getAngle(self, cercle):
+        centre = self.getCentreImage()
+        pxVision = self.getPxVision()
+	vectX, vectY = du.distanceDuCentre(cercle,
+				 centre)
+        
+
+	angleX = du.pxToRad(vectX, pxVision[0])
+	return angleX
 
 #========Zone de test à effacer===========
 """
@@ -187,3 +216,9 @@ while True:
 	analyse.camera.switchCamera()
 	i = 0
 '''
+"""
+filtre = FilterColor()
+#filtre.calibrage()
+videoProxy =  ALProxy("ALVideoDevice", "192.168.1.3", 9559)
+a = Analyse(videoProxy)
+a.AnalyseImg()

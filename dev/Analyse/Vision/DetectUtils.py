@@ -199,7 +199,7 @@ def calculPourcentage(rayon, contour):
         return (aire_objet/aire_cercle)*100
 
 
-def detectCercle(thresh, pourcentage):
+def detecteCercle(thresh, pourcentage):
 	contours = cv2.findContours(thresh.copy(),
 				    cv.CV_RETR_EXTERNAL,
 				    cv.CV_CHAIN_APPROX_NONE)[0]
@@ -214,3 +214,44 @@ def detectCercle(thresh, pourcentage):
 			if pourcent > pourcentage:
 				cercle = Cercle(centre,rayon)
 				liste.append([cercle,pourcent])
+
+		return liste
+
+	return []
+
+
+def detecteCercleHough(thresh):
+	circles = cv2.HoughCircles(thresh.copy(),
+				   cv.CV_HOUGH_GRADIENT,2,15,param1=200,
+				   param2=50,minRadius=10,maxRadius=100)
+        liste = []
+	if circles != None:
+		circles = np.uint16(np.around(circles))
+		for i in circles[0,:]:
+		    cercle = Cercle(i[0],i[1])
+		    liste.append(cercle)
+        return liste
+
+
+def distanceDuCentre(cercle, (centreX, centreY)):
+	#Le repère du nao est inversé donc on multipliera par -1
+	vectX = (cercle.x - centreX) * -1
+	vectY = (cercle.y - centreY) * -1
+	return vectX, vectY
+
+
+def pxToRad(distance, pxVision):
+	angleVision = (60*math.pi)/180
+	
+	pxToAngle = angleVision/pxVision
+
+	return distance * pxToAngle
+
+
+def meilleureBalle(listeBalles):
+	meilleurCercle, meilleurPourcent = None, 0
+	for (cercle,pourcent) in listeBalles:
+		if pourcent > meilleurPourcent:
+			meilleurCercle, meilleurPourcent = cercle, pourcent
+
+	return meilleurCercle
