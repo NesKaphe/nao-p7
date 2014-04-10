@@ -50,7 +50,7 @@ class FilterColor:
 
 		if mini != None:#TODO or maxi ?
 			#Filtre de l'image en fonction de la couleur
-			#imageHSV = cv2.medianBlur(imageHSV,15)
+			imageHSV = cv2.medianBlur(imageHSV,15)
 			#imageHSV = cv2.blur(imageHSV,(10,10))
 			thresh = cv2.inRange(imageHSV,mini,maxi) 
 
@@ -91,16 +91,16 @@ class FilterColor:
 		boucle = True
 		
 		# Nao
-		'''
+		
 		videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
 		cam = Camera(videoProxy, "Calibrage", camera=1, resolution=kVGA)
 		#image = cam.getNewImage()
 		print "Capture de quelques images pour le calibrage"
 		images = cam.getMultipleImages(10,0.1)
-		'''
+		
 		imageCourante = 0
 		# Webcam du pc pour les moments sans nao
-		
+		'''
 		cap = cv2.VideoCapture(0)
 		images = []
 		i = 0
@@ -108,7 +108,7 @@ class FilterColor:
 			images.append(cap.read()[1])
 			time.sleep(0.1)
 			i += 1
-		
+		'''
 		#Callback pour les trackbar
 		def callback(x):
 			pass
@@ -175,7 +175,7 @@ class FilterColor:
 				
 
 				#Filtre de l'image en fonction de la couleur
-				#imageHSV = cv2.medianBlur(imageHSV,15)
+				imageHSV = cv2.medianBlur(imageHSV,15)
 				#imageHSV = cv2.blur(imageHSV,(10,10))
 				thresh = cv2.inRange(imageHSV,mini,maxi) 
 				
