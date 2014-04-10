@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import cv2
 import cv2.cv as cv
 import numpy as np
@@ -445,6 +446,76 @@ def multiple_union_succ (imgs):
 
 	return im_result
 
+##########################################################################################
+##########################################################################################
+##########################################################################################
+####TESTES DES ZONES AVEC DES THRESH
+##########################################################################################
+##########################################################################################
+
+"""
+class Cercle :
+"""
+class Cercle:
+	def __init__(self, (x,y), rayon):
+		self.x = x
+		self.y = y
+		self.rayon = rayon
+
+	def __str__(self):
+		return "(("+str(self.x)+","+str(self.y)+"),"+str(self.rayon)+")"
+
+
+"""
+class zone coordonées x,y plus la dimension dx,dy si dy = None la zone est carré 
+"""
+class Zone():
+	def __init__(self,(x,y),dx,dy=None) :
+		if x<0 or y<0 :
+			raise NameError ("zone malformée")
+		self.x,self.y = (x,y)
+		self.dx = dx
+		if dy is None :
+			self.dy = dx
+		else :
+			self.dy = dy
+		
+	def __str__(self):
+		return "("+str(self.x)+","+str(self.y)+"), dx:"+str(self.dx)+" dy:"+str(self.dy)
+
+		
+	def isIn(self,cercle):
+		testX = (cercle.x >= self.x) and (cercle.x <= self.x+self.dx)#on évide de dupliquer le teste
+		if self.dy is not None :
+			return testX and (cercle.y >= self.y) and (cercle.y <= self.y+self.dy)
+		else :
+			return testX and (cercle.y >= self.y) and (cercle.y <= self.y+self.dx)
+			
+			
+def detectZone (thresh,zone):
+	
+	x_max = thresh.shape[0]
+	y_max = thresh.shape[1]
+	if zone.x+zone.dx > x_max or zone.y+zone.dy > y_max :#éventuel erreur (la zone sera au maximum de la dimensions du thresh
+		raise NameError ("la zone étudié est plus grande que le thresh")
+
+	"""
+	#vesion qui prend 3 plombes
+	for r in range(zone.y,zone.y+zone.dy):#r et c sont à  l'envers de se que je pensais
+		for c in range(zone.x,zone.x+zone.dx):
+			if thresh[c,r] > 0 :
+				return True
+	"""
+	#version qui utilise les fonctions numpy (du C compilé) donc plus rapide vv
+	return thresh[zone.y:zone.y+zone.dy,zone.x:zone.x+zone.dx].any()
+	
+	#return False #on a rien trouvé dans la zone
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+
 
 def main() :
 	global cap
@@ -544,7 +615,7 @@ def main() :
 	cv2.imshow("fusion !!! ", u)
 	"""
 	#teste d'unions multiples :
-	
+	"""
 	print "image 0?"
 	cv2.waitKey(0)#attendre l'utilisateur
 	img0 = get_one_img(0)
@@ -569,7 +640,7 @@ def main() :
 	cv2.imshow("img2 ", img2[0])
 	cv2.imshow("img3 ", img3[0])
 	cv2.imshow("multi fusion !!! ", mu)
-	
+	"""
 	"""
 	##############################################################
 	#ICI C'est le banc de teste :
@@ -599,6 +670,30 @@ def main() :
 	cv2.imshow("img3 ", img3[0])
 	cv2.imshow("multi fusion !!! ", mu)
 	"""
+	
+	print "image 0?"
+	cv2.waitKey(0)#attendre l'utilisateur
+	img0 = get_one_img(0)
+	z = Zone ((0,0),img0[0].shape[0],img0[0].shape[1])#toute l'image
+	#z = Zone ((200,200),100)#toute l'image
+	
+	
+	
+	print "shape =",img0[0].shape
+	print z
+	while True:
+		img0 = get_one_img(0)
+		
+		
+		tps1 = time.clock()#calcul du temps
+		print "y a t'il quelque chose dans la zone? ",detectZone (img0[0],z)
+		tps2 = time.clock()#calcul du temps
+		print"temps mis par detectZone :",(tps2 - tps1)
+		
+		
+		cv2.rectangle(img0[0],(z.x,z.y),(z.y+z.dy,z.x+z.dx),(128,128,128),5)#pour dessiner la zone
+		cv2.imshow("img0 ", img0[0])
+	
 	#############################################################
 	
 	cv2.waitKey(0)#fermer si il a y une touche appuye

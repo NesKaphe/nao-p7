@@ -7,6 +7,10 @@ import time
 import math
 
 
+print "import OK"
+"""
+class Cercle :
+"""
 class Cercle:
 	def __init__(self, (x,y), rayon):
 		self.x = x
@@ -18,17 +22,41 @@ class Cercle:
 
 
 """
-class zone coordonées x,y plus la
+class zone coordonées x,y plus la dimension dx,dy si dy = None la zone est carré 
 """
 class Zone():
 	def __init__(self,(x,y),dx,dy=None) :
+		if x<0 or y<0 :
+			raise NameError ("zone malformée")
 		self.x,self.y = (x,y)
-		self.delta = delta
-
+		self.dx = dx
+		if dy is None :
+			self.dy = dx
+		else :
+			self.dy = dy
+		
 	def __str__(self):
-		return "("+str(self.x)+","+str(self.y)+"),"+str(self.delta)
+		return "("+str(self.x)+","+str(self.y)+"), dx:"+str(self.dx)+" dy:"+str(self.dy)
 
 		
+	def isIn(self,cercle):#prend le centre d'un cercle et répond si le cercle est dans la zone
+		testX = (cercle.x >= self.x) and (cercle.x <= self.x+self.dx)#on évide de dupliquer le teste
+		if self.dy is not None :
+			return testX and (cercle.y >= self.y) and (cercle.y <= self.y+self.dy)
+		else :
+			return testX and (cercle.y >= self.y) and (cercle.y <= self.y+self.dx)
+
+"""
+#petit teste de isIn()
+z = Zone((10,10),2)
+c = Cercle((11,11),50)
+
+print "zone :",z
+print "cercle :",c
+print "is in zone :",z.isIn(c)
+"""
+
+
 
 """
 createEmptyThresh (shape):
@@ -201,22 +229,42 @@ def multipleUnionSucc (imgs):
 	return im_result
 
 
-#########NOUVELLES fonctonctions
+#########NOUVELLES fonctions
 
 
 	
 
+#retourne vrai si la zone contient au moins un px blanc
+def detectZone (thresh,zone):
+	x_max = thresh.shape[0]
+	y_max = thresh.shape[1]
+	if zone.x+zone.dx > x_max or zone.y+zone.dy > y_max :#éventuel erreur (la zone sera au maximum de la dimensions du thresh
+		raise NameError ("la zone étudié est plus grande que le thresh")
 
-def detectZone (thresh,zone,):
-	pass
+	for r in range(zone.y,zone.y+zone.dy):#r et c sont à  l'envers de se que je pensais
+		for c in range(zone.x,zone.x+zone.dx):
+			if thresh[c,r] > 0 :
+				return True
+	
+	return False #on a rien trouvé dans la zone
+			
+#prend une img et dessine le cercle dedans
+def dessineCercle(img,cercle):
+	cv2.circle(img,(cercle.x,cercle.y),cercle.rayon,(0,255,255),2)
+	
+#prend une img et dessine la zone dedans
+def dessineZone(img,z):
+	cv2.rectangle(img,(z.x,z.y),(z.y+z.dy,z.x+z.dx),(256,0,256),2)
 
 
+#pour calculer le taux de remplissage du cercle
 def calculPourcentage(rayon, contour):
         aire_objet = cv2.contourArea(contour)
         aire_cercle = math.pi*rayon*rayon
         return (aire_objet/aire_cercle)*100
 
 
+#retourne les cercles et leurs pourcentage
 def detectCercle(thresh, pourcentage):
 	contours = cv2.findContours(thresh.copy(),
 				    cv.CV_RETR_EXTERNAL,
@@ -232,3 +280,5 @@ def detectCercle(thresh, pourcentage):
 			if pourcent > pourcentage:
 				cercle = Cercle(centre,rayon)
 				liste.append([cercle,pourcent])
+		return liste
+	return []
