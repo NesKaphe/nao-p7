@@ -36,7 +36,7 @@ class Analyse:
 
     
     def switchCamera(self):
-		self.camera.switchCamera()
+        self.camera.switchCamera()
 
     '''
     getCentreImage: Retourne un couple (x,y) representant le point central de l'image
@@ -98,7 +98,7 @@ class Analyse:
 	ChercheBallesV2(self):
 	version 2 avec plusieurs images
 	utilisation de la fonction union et multiunion
-	"""
+    """
     def ChercheBallesV2(self):
         #On commence par recuperer une image venant de nao
         self.imgs = self.camera.getMultipleImages(nbImages= 3,pauseCapture = 50)
@@ -171,21 +171,10 @@ class Analyse:
 
 
     def AnalyseImg(self,zone=None,forme=None):#va contenir la nouvelle version
-        #On commence par recuperer une image venant de nao
-        self.imageCourante = self.camera.getNewImage()
 
-        #On change de colorspace (BGR -> HSV)
-        imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)
 
-        #Filtrage de l'image
-        imageFiltre = self.filtre.filtrer(imageHSV, self.bfname)
 
-        #On recherche les cercles
-        cercles = du.detecteCercle(imageFiltre,self.pourcentage)
 
-        cercle = du.meilleureBalle(cercles)
-
-        return cercle
 
     def getAngle(self, cercle):
         centre = self.getCentreImage()
@@ -196,29 +185,3 @@ class Analyse:
 
 	angleX = du.pxToRad(vectX, pxVision[0])
 	return angleX
-
-#========Zone de test à effacer===========
-"""
-filtre = FilterColor()
-filtre.calibrage()
-
-videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
-analyse = Analyse(videoProxy)
-i = 0
-
-while True:
-    result = analyse.BallPosition()
-    print result
-    analyse.afficheImagesCourantes()
-    cv2.waitKey(1)
-    i = i + 1
-    if i > 10:
-	analyse.camera.switchCamera()
-	i = 0
-'''
-"""
-filtre = FilterColor()
-#filtre.calibrage()
-videoProxy =  ALProxy("ALVideoDevice", "192.168.1.3", 9559)
-a = Analyse(videoProxy)
-a.AnalyseImg()

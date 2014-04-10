@@ -23,7 +23,11 @@ class Decision:
         #self.rootine()
 
         #self.marcheVersBalle()
-        self.routine2()
+        #self.routine2()
+
+
+
+        self.routine4()
 
     def rootine (self):
         #phase de calibrage
@@ -100,6 +104,23 @@ class Decision:
             (self.motion.getAngles("HeadYaw",True)[0]*180.0)/math.pi
         #mo.aCroupris()
 
+
+
+
+    def routine4(self):
+        mh = Head(self.motion,self.posture)
+        mo = Move(self.motion,self.posture)
+        a = Analyse(self.videoProxy,camera=1)
+        mh.reset()
+        #a.filtre.calibrage()
+        mh.tension(0.0)
+
+        while True:
+            cercle = a.AnalyseImg()
+            if cercle is not None :
+                angle = a.getAngle(cercle)
+                print "cercle : ",cercle," : angle calculé =",(angle*180)/math.pi
+                mh.incrAnglesTo(angle,0.0)
 
 	"""
 	#princilament une recherche plus que du code  :
