@@ -135,4 +135,8 @@ class Move :
 	def aCroupris(self):
 		a_croupis.move(self.motion)
 	
+	def seRetourner(self):
+		self.motion.moveTo(0,0,math.pi)
 	
+	def turnTo(self,angle):
+		self.motion.moveTo(0,0,angle)

@@ -61,6 +61,18 @@ class Camera:
 		self.subscribe()
 
 
+	def setCameraHaut(self):
+		self.unsubscribe()
+		self.camera = 0
+		self.subscribe()
+
+
+	def setCameraBas(self):
+		self.unsubscribe()
+		self.camera = 1
+		self.subscribe()
+
+
 	def getResolution(self):
 		if self.resolution == kQQVGA:
 			return 160, 120 

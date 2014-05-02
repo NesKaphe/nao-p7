@@ -307,18 +307,12 @@ def distanceDuCentre(cercle, (centreX, centreY)):
 
 
 def pxToRad(distance, pxVision):
-	angleVision = (60*math.pi)/180
+	angleVision = math.radian(60)
 	
 	pxToAngle = angleVision/pxVision
 
 	return distance * pxToAngle
 
 
-def meilleureBalle(listeBalles):
-	meilleurCercle, meilleurPourcent = None, 0
-	for (cercle,pourcent) in listeBalles:
-		if pourcent > meilleurPourcent:
-			meilleurCercle, meilleurPourcent = cercle, pourcent
 
-	return meilleurCercle
 

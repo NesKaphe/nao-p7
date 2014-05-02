@@ -28,9 +28,11 @@ class Decision:
 
 
 
-        self.routine4()
+        #self.routine4()
 
-        self.routine3()
+        #self.routine3()
+
+        self.modeRechercheBalle()
 
     def routine (self):
         #phase de calibrage
@@ -136,9 +138,92 @@ class Decision:
 
 
 
+    def modeRechercheBalle(self):
+	#tourner en rond sur lui meme jusqu'à trouver la balle
+        #alterner entre camera du haut et camera du bas entre chaque position
+	#reduire le pourcentage si on trouve pas 
+	#utilisation de redBall traking
+	#si on trouve toujours pas prendre le rouge pour cible
+	#si il a plusieurs balles prendre celle qui est plus à gauche
 
+        cameraNao = 0
+        mh = Head(self.motion,self.posture)
+        mo = Move(self.motion,self.posture)
+        a = Analyse(self.videoProxy,camera=cameraNao)
+        pourcentage = 80
+        self.initialisation()
+        #a.filtre.calibrage()
+        rotationsTete = 0
+        rotationsCorps = 0
+        direction = 1 #1 pour la gauche et -1 pour la droite
+        trouve = False
+        balle = None
 
+        while trouve is not True:
+            nbImages = 5
+            while nbImages > 0:
+                cerclesP = a.AnalyseImg(cercle=pourcentage)
 
+                if cerclesP != []:
+                    trouve = True
+                    balle = a.meilleureBalle(cerclesP)
+                    break
+                nbImages -= 1
+
+            if not trouve:
+
+                if cameraNao == 0:
+                    a.switchCamera()
+                    cameraNao += 1
+                else:
+                    a.switchCamera()
+                    cameraNao = 0
+                    if rotationsTete < 4: #Si on n'a pas la balle, on va tourner la tete
+                        if rotationsTete > 0 and rotationsTete % 2 == 0:
+                            mh.reset() #On remet la tete droite
+                            direction *= -1
+
+                        angleIncr = direction * math.pi/4
+                        mh.incrAnglesTo(angleIncr,0.0)
+                        rotationsTete += 1
+
+                    else: #On doit maintenant bouger le corps
+                        rotationsTete = 0
+                        mh.reset()
+                        mo.seRetourner()
+                        rotationsCorps = 1
+                        if rorationsCorps % 2 == 0:
+                            rotationsCorps = 0
+                            #On reduit finalement le pourcentage
+                            pourcentage += 20
+                            if pourcentage < 0:
+                                pourcentage = 0
+                            
+        
+        #ici on a trouvé la balle, il faudra surement enregistrer la zone ou autre
+        print "La balle est : ", balle
+        a.afficheImagesCourantes()
+        while True:
+            key = cv2.waitKey(33)
+            key -= 0x100000
+            if key == 113: #on quitte avec la touche q
+                break 
+
+        #Calcul de l'angle pour centrer la balle
+        angleBalleImage = a.getAngle(balle)
+        #On ajoute l'angle de la tete a l'angle calculé pour savoir de combien le corps devra se tourner 
+        angleYaw = mh.getYawAngle()
+        mh.reset() #on remet la tete droite
+        #on tourne le corps
+        mo.turnTo(angleBalleImage + angleYaw)
+        
+
+    def initialisation(self):
+        mh = Head(self.motion,self.posture)
+        mo = Move(self.motion, self.posture)
+        
+        mo.debout()
+        mh.reset() #Regard devant soi
 
 
 """
