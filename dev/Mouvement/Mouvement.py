@@ -143,4 +143,8 @@ class Move :
 	def fermeMain(self):#fermer la main gauche
 		self.motion.closeHand("LHand")
 	
+	def seRetourner(self):
+		self.motion.moveTo(0,0,math.pi)
 	
+	def turnTo(self,angle):
+		self.motion.moveTo(0,0,angle)

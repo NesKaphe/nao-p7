@@ -41,6 +41,12 @@ class Analyse:
     def switchCamera(self):#TODO pourquoi ne pas faire un setCamBas et un setHaut ?
         self.camera.switchCamera()
 
+    def setCameraHaut(self):
+        self.camera.setCameraHaut()
+
+    def setCameraBas(self):
+        self.camera.setCameraBas()
+
     '''
     getCentreImage: Retourne un couple (x,y) representant le point central de l'image
     capturée par la caméra du Nao
@@ -56,6 +62,7 @@ class Analyse:
     def getPxVision(self):
         resolution = self.camera.getResolution()
         return resolution
+
 
     '''
     calculPourcentage: Calcule un pourcentage de remplissage de l'objet par rapport a son cercle
@@ -230,8 +237,14 @@ class Analyse:
 				#retourne un liste qui contient tout les cercles dans la zone
 				return zones
 			else :
+				"""
 				#dessiner les cercle (pour le developpeur):
 				DU.dessineCercle(self.imageCourante,c[0])
+				return cerclesP
+				"""
+				for c in cerclesP :
+					#dessiner les cercle (pour le developpeur):
+					DU.dessineCercle(self.imageCourante,c[0])
 				return cerclesP
 		else :
 			return DU.detectZone(thresh,zone)
@@ -250,8 +263,15 @@ class Analyse:
         vectX, vectY = DU.distanceDuCentre(cercle,centre)#mm commentaire
         angleX = DU.pxToRad(vectX, pxVision[0])
         return angleX
-		
-		
+
+
+	def meilleureBalle(self, listeBalles):
+		meilleurCercle, meilleurPourcent = None, 0
+		for (cercle,pourcent) in listeBalles:
+			if pourcent > meilleurPourcent:
+				meilleurCercle, meilleurPourcent = cercle, pourcent
+
+		return meilleurCercle	
 	'''
 	takeOk(self):
 	----------------------------
