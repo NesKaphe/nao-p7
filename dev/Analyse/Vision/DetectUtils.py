@@ -254,7 +254,7 @@ def dessineCercle(img,cercle):
 	
 #prend une img et dessine la zone dedans
 def dessineZone(img,z):
-	cv2.rectangle(img,(z.x,z.y),(z.y+z.dy,z.x+z.dx),(256,0,256),2)
+	cv2.rectangle(img,(z.x,z.y),(z.x+z.dx,z.y+z.dy),(0,256,0),2)
 
 
 #pour calculer le taux de remplissage du cercle
