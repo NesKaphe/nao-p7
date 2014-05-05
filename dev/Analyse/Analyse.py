@@ -186,12 +186,7 @@ class Analyse:
         cv2.waitKey(1)
 
 
-<<<<<<< HEAD
-	#parametre cercle = pourcentage de remplissage du cercle
-	# zone = objet zone à analyser
-	#la combinaison des 2 nous remvois les cercles dans la zone	
-    def AnalyseImg(self,zone=None,cercle=None) :#va contenir la nouvelle version
-=======
+
 	'''
 	AnalyseImg :
 	--------------------------------------------
