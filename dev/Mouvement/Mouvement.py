@@ -13,6 +13,7 @@ import time
 import almath
 import math#contien pi
 import a_croupis
+import relever
 
 
 IP = "192.168.1.3"
@@ -46,12 +47,10 @@ class Head:
 	def tension (self,t):
 		self.motion.setStiffnesses("Head", t)	
 
-	def incrAnglesTo(self,angleYaw,anglePitch,speedX=1.5,speedY=1.5) :#va donner les angles directement a la tête (angle en radian)
+	def incrAnglesTo(self,angleYaw,anglePitch,speedX=1.5,speedY=1.5) :#va incrementer les angles de la tete avec ceux en parametres
 		self.motion.setStiffnesses("Head", 1.0)
-
 		angleYaw += self.getYawAngle()
 		anglePitch += self.getPitchAngle()
-
 		names  = ["HeadYaw", "HeadPitch"]
 		angles = [angleYaw, anglePitch]
 		times  = [speedX, speedY]
@@ -134,6 +133,15 @@ class Move :
 		
 	def aCroupris(self):
 		a_croupis.move(self.motion)
+	
+	def relever(self):
+		relever.move(self.motion)
+	
+	def ouvreMain(self):#ouvrir la main gauche
+		self.motion.openHand("LHand")
+	
+	def fermeMain(self):#fermer la main gauche
+		self.motion.closeHand("LHand")
 	
 	def seRetourner(self):
 		self.motion.moveTo(0,0,math.pi)

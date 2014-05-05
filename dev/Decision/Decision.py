@@ -25,14 +25,14 @@ class Decision:
 
         #self.marcheVersBalle()
         #self.routine2()
-
-
-
+        self.modePrendreBalle()
         #self.routine4()
-
         #self.routine3()
+        #self.modeRechercheBalle()
 
-        self.modeRechercheBalle()
+
+
+
 
     def routine (self):
         #phase de calibrage
@@ -111,30 +111,54 @@ class Decision:
 
 
 
-    def routine4(self):
+    def routine4(self):#routine 4 je crois qu'elle incrma
         mh = Head(self.motion,self.posture)
         mo = Move(self.motion,self.posture)
         a = Analyse(self.videoProxy,camera=1)
         mh.reset()
         #a.filtre.calibrage()
         mh.tension(0.0)
-
         while True:
-            cercle = a.AnalyseImg()
+            cercle = a.AnalyseImg()#manque des paramètres sinon ça marche pas
             if cercle is not None :
                 angle = a.getAngle(cercle)
-                print "cercle : ",cercle," : angle calculé =",(angle*180)/math.pi
+                print "cercle : ",cercle," : angle calculé =",(angle*180)/math.pi #TODO math.radian() à la place
                 mh.incrAnglesTo(angle,0.0)
 
 
+
     def routine3(self): #teste pour la nouvelle fonction d'analyseImg
-		a = Analyse(self.videoProxy,camera=1)
+		a = Analyse(self.videoProxy,self.motion,self.posture,camera=1)
 		z = DU.Zone((200,200),200)
-		#a.filtre.calibrage()
+
+
+		print"zone:",z
+		#a.filtre.calibrage()#pour calibrer
 		while True:
 			cerclesZone = a.AnalyseImg(zone=z,cercle=70)
 			print "cercles = ",cerclesZone
 			a.afficheImagesCourantes()
+
+
+
+    def modePrendreBalle(self):#premiere vesion pour prendre la balle
+		mo = Move(self.motion,self.posture)
+		a = Analyse(self.videoProxy,self.motion,self.posture,camera=1)
+		mo.debout()
+		while not a.takeOk() :
+			print "je ne peux pas prendre la balle"
+			a.afficheImagesCourantes()
+		print "je peux prendre la balle!"
+		#mo.ouvreMain()#ouvrir la main gauche
+		mo.aCroupris()
+		print "ici je dois prendre la balle!!"
+		time.sleep(2)#attente histoire de ..
+		#ici faire aussi un check sur les capteurs
+		mo.relever()
+		mo.fermeMain()
+		#ici il faudrait faire une fonction check hand (verif main) 
+
+
 
 
 
@@ -227,12 +251,22 @@ class Decision:
         mo.turnTo(angleBalleImage + angleYaw)
 
 
+
+
+
+
+
     def initialisation(self):
         mh = Head(self.motion,self.posture)
         mo = Move(self.motion, self.posture)
         
         mo.debout()
         mh.reset() #Regard devant soi
+
+
+
+
+
 
 
 """
@@ -262,7 +296,7 @@ def modeAvanceVersBalle(self)
 	#si la tête ne ce recentre pas automatiquement ou si la balle ne c'est pas raproché du centre
 	
 	pass
->>>>>>> bfd1f724dc3710f54dafbd814a043afe5b55f5ea
+
 	
 def modePrendreBalle(self):
 	while ?? :

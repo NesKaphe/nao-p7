@@ -8,18 +8,20 @@ import cv2
 import cv2.cv as cv
 import numpy as np
 import math
+from Mouvement.Mouvement import *
 from vision_definitions import *
 
 
 class Analyse:
     
-    def __init__(self, videoProxy, camera=1):
-        #
+    def __init__(self, videoProxy,motion,posture, camera=1):
+ 		#recuperation des proxy :
         self.videoProxy = videoProxy
-
+        self.motion = motion
+        self.posture = posture
         #On recupère l'interface avec la caméra du nao
-        self.camera = Camera(self.videoProxy, "Analyse", camera=camera, resolution=kVGA)
-        #self.camera.subscribe()
+        self.camera = Camera(self.videoProxy, "Analyse", camera=camera,resolution=kVGA)
+        #self.camera.subscribe()#TODO : à retirer si pas utile
 
         #On recupère notre filtre de couleurs
         self.filtre = FilterColor()
@@ -30,18 +32,13 @@ class Analyse:
         #nom du filtre de la balle
         self.bfname = "Balle"#balle filtrer name #TODO trouver un moyen de directement le recuperer dans le fichier
         
-        #Nombre d'images qui seront analysées a chaque fois
-        self.nbImagesAnalyse = 5
 
-        #Position de detection des balles sur chaque image analyse
-        self.posBalle = []
-
-    def createProxies(self):
+    def createProxies(self):#TODO : à retirer
         #A changer par des paramètres dans un fichier de config
         self.videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)#TODO utiliser Decision pour récupérer l'IP et port (ou autre fichier si changement)
 
     
-    def switchCamera(self):
+    def switchCamera(self):#TODO pourquoi ne pas faire un setCamBas et un setHaut ?
         self.camera.switchCamera()
 
     def setCameraHaut(self):
@@ -60,7 +57,8 @@ class Analyse:
         centreY = resY / 2
         return centreX, centreY
     
-
+	#TODO : cette méthode n'a pas beaucoup d'intéret !
+	#possibilité de faire : return self.camera.getResolution()
     def getPxVision(self):
         resolution = self.camera.getResolution()
         return resolution
@@ -82,7 +80,7 @@ class Analyse:
     -centre est un couple de la forme (x,y)
     '''
     #Renvoie une liste de la forme : (centre,rayon)
-    def ChercheBalles(self):
+    def ChercheBalles(self):#TODO à retirer
 		#On commence par recuperer une image venant de nao
 		self.imageCourante = self.camera.getNewImage()
 
@@ -113,7 +111,7 @@ class Analyse:
     utilisation de la fonction union et multiunion
     '''
 
-    def ChercheBallesV2(self):
+    def ChercheBallesV2(self):#TODO à retirer
 		#On commence par recuperer une image venant de nao
 		self.imgs = self.camera.getMultipleImages(nbImages= 3,pauseCapture = 50)
 		
@@ -152,7 +150,7 @@ class Analyse:
     de ressemblance avec une Balle (Si au moins une balle est detectée)
     - None si aucune balle n'a été trouvée dans l'image
     '''
-    def BallPosition(self):
+    def BallPosition(self):#TODO à retirer
         listeBalles = self.ChercheBalles()
         if len(listeBalles) > 0:
             meilleure = listeBalles[0]
@@ -179,30 +177,51 @@ class Analyse:
     '''
     afficheImagesCourantes: Permet d'afficher l'image courante traitée par l'analyse à l'écran
     '''
+    #TODO mettre imageCourante et l'autre dans __init__
+    #problème ça marche pas si on à fait aucun traitement faire un affichage quand même avec se que l'ont a
+    #ajouter le paramètre 0 ou 1 pour avoir image du haut ou du bas (a voir )
     def afficheImagesCourantes(self):
         cv2.imshow("Original",self.imageCourante)
         cv2.imshow("Filtre",self.imageFiltreCourante)
         cv2.waitKey(1)
 
 
+<<<<<<< HEAD
 	#parametre cercle = pourcentage de remplissage du cercle
 	# zone = objet zone à analyser
 	#la combinaison des 2 nous remvois les cercles dans la zone	
     def AnalyseImg(self,zone=None,cercle=None) :#va contenir la nouvelle version
+=======
+	'''
+	AnalyseImg :
+	--------------------------------------------
+	méthode qui permet de faire les analyses sur une image.
+	Elle à plusieurs retours differents en fonction de ces paramètres.
+	
+	parametres :
+	--------------------------------------------
+	cercle = pourcentage de remplissage du cercle
+	zone = objet zone à analyserunexpected indent
+	dessin = si on veux que la zone et du cercle soit dans l'image courrante !!!!pas encore implémenté
+	///dans un futur développement il sera possible d'ajouter de nouveaux parametres
+	retour :
+	--------------------------------------------
+	cercle : retourne la position de tout les cercles trouvés avec leur pourcentage remplissage
+	zone : vrai si la zone observée (après fitrage) contient quelque chose (au moins un pixel blanc)
+	cerlce + zone : renvois les cercles dans la zone (avec leurs pourcentages de remplissage respectif)
+					Un cercle est considéré dans la zone si son centre est dans la zone.
+	'''
+	#TODO : implémenter le paramètre dessin
+    def AnalyseImg(self,zone=None,cercle=None,dessin=True) :#va contenir la nouvelle version
 	
 		if zone is None and cercle is None :
 			raise NameError("pas de paramettres")
 		
-                self.posBalle = []
-                nbImagesRestantes = self.nbImagesAnalyse
-                
 		#mise creation du thresh :
 		self.imageCourante = self.camera.getNewImage()
 		imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)
 		thresh = self.filtre.filtrer(imageHSV, self.bfname)
 		self.imageFiltreCourante = thresh
-		
-		
 		
 		cerclesP = []#liste de cercles plus pourcentages
 		zones = []#va contenir la liste des objets dans la zone
@@ -224,28 +243,113 @@ class Analyse:
 				#retourne un liste qui contient tout les cercles dans la zone
 				return zones
 			else :
-                            for c in cerclesP :
-                                #dessiner les cercle (pour le developpeur):
-                                DU.dessineCercle(self.imageCourante,c[0])
-                            return cerclesP
+				"""
+				#dessiner les cercle (pour le developpeur):
+				DU.dessineCercle(self.imageCourante,c[0])
+				return cerclesP
+				"""
+				for c in cerclesP :
+					#dessiner les cercle (pour le developpeur):
+					DU.dessineCercle(self.imageCourante,c[0])
+				return cerclesP
 		else :
 			return DU.detectZone(thresh,zone)
 		
-
+	#TODO : commenter !!!!!!
+	#COMMENT : problème cette distance au centre ne ce fait que avec des cercles 
+	#il faudrait que ce soit possible de passer des coordonées et/ou des cercles
+	# exemple :
+	#getAngle(cercle) possible
+	#getAngle((100,150)) possible
+	#prend en paramètre un cercle et calcul angle qui permet de centrer 
+	#le cercle dans l'iage
     def getAngle(self, cercle):
         centre = self.getCentreImage()
         pxVision = self.getPxVision()
-	vectX, vectY = DU.distanceDuCentre(cercle,
-				 centre)
-        
+        vectX, vectY = DU.distanceDuCentre(cercle,centre)#mm commentaire
+        angleX = DU.pxToRad(vectX, pxVision[0])
+        return angleX
 
-	angleX = DU.pxToRad(vectX, pxVision[0])
-	return angleX
 
-    def meilleureBalle(self, listeBalles):
-	meilleurCercle, meilleurPourcent = None, 0
-	for (cercle,pourcent) in listeBalles:
-		if pourcent > meilleurPourcent:
-			meilleurCercle, meilleurPourcent = cercle, pourcent
+	def meilleureBalle(self, listeBalles):
+		meilleurCercle, meilleurPourcent = None, 0
+		for (cercle,pourcent) in listeBalles:
+			if pourcent > meilleurPourcent:
+				meilleurCercle, meilleurPourcent = cercle, pourcent
 
-	return meilleurCercle
+		return meilleurCercle	
+	'''
+	takeOk(self):
+	----------------------------
+	retourne vrai si la ball est aux bonnes coordonées pour être prise
+	'''
+    def takeOk(self):
+		#Pitch de la tête entre 20° Yaw = 0°
+		mh = Head(self.motion,self.posture)
+		mh.turnTo(math.radians(0),math.radians(20))
+		z = self.getZoneTake()
+		print "la zone:",z
+		c = self.AnalyseImg(zone=z,cercle=70)#ici faire une analyse fine !!
+		if len(c) > 0 :
+			return True
+		else :
+			return False
+	
+	
+    '''
+	VrtOk(self):
+	--------------------------
+	retourne vrai si la position vertical de la balle est bonne
+    '''
+    def VertOk(self):#
+		#Pitch de la tête entre 20° Yaw = 0°
+		AnalyseImg()#TODO : a finir
+	
+    '''
+	HrzOk(self):
+	---------------------------
+	retourne vrai si la position horizontal est bonne
+    '''
+    def HrzOk(self):
+		pass #TODO : a faire
+	
+    '''
+	getZoneTake(self):
+	---------------------------
+	retourne la zone où la balle doit être prise en fonction de la résolution
+    '''
+    def getZoneTake(self):
+		width = self.camera.getResolution()[0]
+		
+		#ceci est la zone idéale pour la résolution kVGA :
+		#x = 145
+		#y = 320
+		x=105
+		y=360
+		dx = 40
+		dy = 40
+		
+		if   width == 640 :
+			return DU.Zone((x,y),dx,dy)
+		elif width == 320 :
+			return DU.Zone((x//2,y//2),dx//2,dy//2)
+		elif width == 160 :
+			return DU.Zone((x//4,y//4),dx//4,dy//4)	
+		else :
+			return DU.Zone((x*2,y*2),dx*2,dy*2)
+			
+		"""
+		#version debug
+		if   width == 640 :
+			print "640"
+			return DU.Zone((x,y),dx)
+		elif width == 320 :
+			print "320"
+			return DU.Zone((x//2,y//2),dx//2)
+		elif width == 160 :
+			print "160"
+			return DU.Zone((x//4,y//4),dx//4)	
+		else :
+			print "1280"
+			return DU.Zone((x*2,y*2),dx*2)
+		"""
