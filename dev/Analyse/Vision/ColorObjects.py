@@ -87,13 +87,13 @@ class FilterColor:
 	''' va afficher la fenetre pour calibrer les couleurs + interaction avec la console pour
 	faire plusieurs enregistrements
 	'''
-	def calibrage(self): #TODO: permettre d'annuler avant de commencer le calibrage
+	def calibrage(self, cam): #TODO: permettre d'annuler avant de commencer le calibrage
 		boucle = True
 		
 		# Nao
 		
 		videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)
-		cam = Camera(videoProxy, "Calibrage", camera=1, resolution=kVGA)
+		cam = Camera(videoProxy, "Calibrage", camera=cam, resolution=kVGA)
 		#image = cam.getNewImage()
 		print "Capture de quelques images pour le calibrage"
 		images = cam.getMultipleImages(10,0.1)

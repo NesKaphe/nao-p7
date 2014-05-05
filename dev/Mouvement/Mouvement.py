@@ -139,4 +139,7 @@ class Move :
 		self.motion.moveTo(0,0,math.pi)
 	
 	def turnTo(self,angle):
-		self.motion.moveTo(0,0,angle)
+		self.motion.move(0.1,0.1,0.1)
+                #self.motion.setWalkTargetVelocity(0.1,0.1,0.1,0.1)
+		#self.motion.moveTo(0.3,0,angle)
+		#self.motion.moveTo(1,0,0) #TODO: pour le test !!!!!

@@ -307,7 +307,7 @@ def distanceDuCentre(cercle, (centreX, centreY)):
 
 
 def pxToRad(distance, pxVision):
-	angleVision = math.radian(60)
+	angleVision = math.radians(60)
 	
 	pxToAngle = angleVision/pxVision
 

@@ -18,7 +18,7 @@ class Analyse:
         self.videoProxy = videoProxy
 
         #On recupère l'interface avec la caméra du nao
-        self.camera = Camera(self.videoProxy, "Analyse", camera=camera,resolution=kVGA)
+        self.camera = Camera(self.videoProxy, "Analyse", camera=camera, resolution=kVGA)
         #self.camera.subscribe()
 
         #On recupère notre filtre de couleurs
@@ -29,6 +29,12 @@ class Analyse:
         
         #nom du filtre de la balle
         self.bfname = "Balle"#balle filtrer name #TODO trouver un moyen de directement le recuperer dans le fichier
+        
+        #Nombre d'images qui seront analysées a chaque fois
+        self.nbImagesAnalyse = 5
+
+        #Position de detection des balles sur chaque image analyse
+        self.posBalle = []
 
     def createProxies(self):
         #A changer par des paramètres dans un fichier de config
@@ -178,6 +184,7 @@ class Analyse:
         cv2.imshow("Filtre",self.imageFiltreCourante)
         cv2.waitKey(1)
 
+
 	#parametre cercle = pourcentage de remplissage du cercle
 	# zone = objet zone à analyser
 	#la combinaison des 2 nous remvois les cercles dans la zone	
@@ -185,8 +192,10 @@ class Analyse:
 	
 		if zone is None and cercle is None :
 			raise NameError("pas de paramettres")
-			
-			
+		
+                self.posBalle = []
+                nbImagesRestantes = self.nbImagesAnalyse
+                
 		#mise creation du thresh :
 		self.imageCourante = self.camera.getNewImage()
 		imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)

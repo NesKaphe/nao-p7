@@ -152,17 +152,23 @@ class Decision:
         a = Analyse(self.videoProxy,camera=cameraNao)
         pourcentage = 80
         self.initialisation()
-        #a.filtre.calibrage()
+        #a.filtre.calibrage(0)
+        #a.filtre.calibrage(1)
         rotationsTete = 0
         rotationsCorps = 0
         direction = 1 #1 pour la gauche et -1 pour la droite
         trouve = False
         balle = None
+        resolution = a.camera.getResolution()
+        zone_camera_haut = DU.Zone((0,resolution[1]/2), resolution[0], resolution[1] /2 )
 
         while trouve is not True:
             nbImages = 5
             while nbImages > 0:
-                cerclesP = a.AnalyseImg(cercle=pourcentage)
+                if cameraNao == 0:
+                    cerclesP = a.AnalyseImg(zone=zone_camera_haut, cercle=pourcentage)
+                else:
+                    cerclesP = a.AnalyseImg(cercle=pourcentage)
 
                 if cerclesP != []:
                     trouve = True
@@ -212,11 +218,14 @@ class Decision:
         #Calcul de l'angle pour centrer la balle
         angleBalleImage = a.getAngle(balle)
         #On ajoute l'angle de la tete a l'angle calculé pour savoir de combien le corps devra se tourner 
+
         angleYaw = mh.getYawAngle()
+
         mh.reset() #on remet la tete droite
         #on tourne le corps
+
         mo.turnTo(angleBalleImage + angleYaw)
-        
+
 
     def initialisation(self):
         mh = Head(self.motion,self.posture)
