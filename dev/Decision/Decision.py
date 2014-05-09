@@ -25,11 +25,12 @@ class Decision:
 
         #self.marcheVersBalle()
         #self.routine2()
+        self.modePositionneBalle()
         self.modePrendreBalle()
         #self.routine4()
         #self.routine3()
         #self.modeRechercheBalle()
-
+	
 
 
 
@@ -140,19 +141,39 @@ class Decision:
 			a.afficheImagesCourantes()
 
 
-
+    '''
+	modePrendreBalle(self):
+	---------------------------------------
+	c'est le mode ou le robot va ce mettre à croupis
+	et prendre la balle. Et ce relever.
+    '''
     def modePrendreBalle(self):#premiere vesion pour prendre la balle
 		mo = Move(self.motion,self.posture)
 		a = Analyse(self.videoProxy,self.motion,self.posture,camera=1)
-		mo.debout()
+		
+		"""
+		#pour afficher la zone total
+		res = a.camera.getResolution()
+		print "la resolution est ",res
+		zo = DU.Zone((0,0),res[0],res[1])
+		print "la zone total =",zo
+		"""
+		
+		mo.deboutMarche()
 		while not a.takeOk() :
 			print "je ne peux pas prendre la balle"
 			a.afficheImagesCourantes()
+			cv2.waitKey(0)
 		print "je peux prendre la balle!"
-		#mo.ouvreMain()#ouvrir la main gauche
-		mo.aCroupris()
+		mo.aCroupris()#TODO modifier l'angle de tete pour 
 		print "ici je dois prendre la balle!!"
-		time.sleep(2)#attente histoire de ..
+		"""
+		while True :
+			pos = a.AnalyseImg(zone=zo,cercle=70)#pour dessiner la zone et le cercle
+			if pos != [] :
+				print "pos = ",pos[0][0]
+			a.afficheImagesCourantes()
+		"""
 		#ici faire aussi un check sur les capteurs
 		mo.relever()
 		mo.fermeMain()
@@ -161,8 +182,13 @@ class Decision:
 
 
 
-
+    '''
+	modeRechercheBalle():
+	-----------------------------------------
+	mode qui permet de rerchercher la balle autour du robot
+    '''
     def modeRechercheBalle(self):
+    #TODO : les commentaires ne sont peut être plus bon
 	#tourner en rond sur lui meme jusqu'à trouver la balle
         #alterner entre camera du haut et camera du bas entre chaque position
 	#reduire le pourcentage si on trouve pas 
@@ -184,6 +210,8 @@ class Decision:
         balle = None
 
         while trouve is not True:
+        	#TODO : remplacer par AnalyseMultiImg
+        	#----------------------------------------
             nbImages = 5
             while nbImages > 0:
                 cerclesP = a.AnalyseImg(cercle=pourcentage)
@@ -193,7 +221,8 @@ class Decision:
                     balle = a.meilleureBalle(cerclesP)
                     break
                 nbImages -= 1
-
+			#----------------------------------------
+			#----------------------------------------
             if not trouve:
 
                 if cameraNao == 0:
@@ -240,11 +269,66 @@ class Decision:
         mh.reset() #on remet la tete droite
         #on tourne le corps
         mo.turnTo(angleBalleImage + angleYaw)
-        
 
 
-
-
+    """
+	modePositionneBalle(self):
+	----------------------------------------------------------
+	C'est le mode qui permet de ce positionner au bon endroit
+	pret de la balle.
+	retourne faux si la balle est considéré comme perdu
+	retourne vrai si la balle est à la bonne position
+    """
+    def modePositionneBalle(self):
+		cameraNao = 0
+		a = Analyse(self.videoProxy,self.motion,self.posture,camera=cameraNao)
+		mo = Move(self.motion,self.posture)
+		
+		cpt_bp = 0 #compteur de balles perdu
+		cpt_max = 4 #max de balle perdu
+		#on continu tant que la position de la balle n'est pas bonne
+		while not a.takeOk() :
+		
+			#placement horizontal:
+			while True :
+				h = a.HrzOk()
+				print "h = ",h
+				if h is None :
+					cpt_bp+=1
+				elif h == "ok" :
+					pass
+				elif h == "avant":
+					mo.pasEnAvant()
+				elif h == "arriere":
+					mo.pasEnArriere()
+					
+				if cpt_bp >= cpt_max :
+					return False
+					
+			#placement vertical :
+				vert = a.VertOk()
+				print "vert =",vert
+				if vert is None :
+					cpt_bp+=1
+				elif vert == "ok" :
+					pass
+				elif vert == "gauche":
+					print "debug nao pas à gauche"
+					mo.pasAGauche()
+				elif vert == "droite":
+					print "debug nao pas à droite"
+					mo.pasADroite()
+				
+				#sortir si on est ok
+				if h == "ok" and vert == "ok" :
+					print "position ok"
+					break
+				
+				if cpt_bp >= cpt_max :
+					return False
+		
+		return True
+				
 
 
     def initialisation(self):
@@ -253,8 +337,6 @@ class Decision:
         
         mo.debout()
         mh.reset() #Regard devant soi
-
-
 
 
 

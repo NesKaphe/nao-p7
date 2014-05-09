@@ -25,7 +25,7 @@ class Head:
 		self.posture = posture
 		#correspond au temps/vitesse pour atteindre l'angle voulut
 		self.incrSpeeds = 0.05
-		self.step = 0.02 #correspond au "pas" précis
+		self.step = 0.02 #correspond au "pas" précis #TODO n'est pas utilisé
 	
 	def getYawAngle (self):#retourne l'angle Yaw en radian
 		return self.motion.getAngles("HeadYaw",True)[0]
@@ -122,11 +122,15 @@ class Move :
 	def __init__(self,motion,posture):
 		self.motion = motion
 		self.posture = posture
+		self.pas = 0.02#un pas représente 1 cm
 	
 	def debout(self):
 		self.posture.goToPosture("Stand", 0.5)
 		#self.motion.moveInit()	
 
+	def deboutMarche(self):
+		self.posture.goToPosture("StandInit", 0.5)
+		
 	def marche(self):
 		self.debout()
 		pass
@@ -148,3 +152,15 @@ class Move :
 	
 	def turnTo(self,angle):
 		self.motion.moveTo(0,0,angle)
+		
+	def pasEnAvant(self):
+		self.motion.moveTo(self.pas,0,0)
+	
+	def pasEnArriere(self):
+		self.motion.moveTo(-self.pas,0,0)
+		
+	def pasAGauche(self):
+		self.motion.moveTo(0,self.pas,0)
+		
+	def pasADroite(self):
+		self.motion.moveTo(0,-self.pas,0)

@@ -46,15 +46,6 @@ class Zone():
 		else :
 			return testX and (cercle.y >= self.y) and (cercle.y <= self.y+self.dx)
 
-"""
-#petit teste de isIn()
-z = Zone((10,10),2)
-c = Cercle((11,11),50)
-
-print "zone :",z
-print "cercle :",c
-print "is in zone :",z.isIn(c)
-"""
 
 
 
@@ -312,6 +303,13 @@ def pxToRad(distance, pxVision):
 	pxToAngle = angleVision/pxVision
 
 	return distance * pxToAngle
+
+'''
+calculer la distance entre 2 centre de cercle
+mettre en paramètre un couple de points
+'''
+def distance(c1,c2):
+	math.sqrt( math.pow(c1.x-c2.x,2) + math.pow(c1.y-c2.y,2) )
 
 
 
