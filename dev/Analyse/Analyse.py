@@ -16,7 +16,7 @@ from vision_definitions import *
 class Analyse:
     
     def __init__(self, videoProxy,motion,posture, camera=1):
- 		#recuperation des proxy :
+        #recuperation des proxy :
         self.videoProxy = videoProxy
         self.motion = motion
         self.posture = posture
@@ -71,11 +71,11 @@ class Analyse:
         cv2.waitKey(1)
 
 
-	#TODO : commentaire
+    #TODO : commentaire
     def testZone(self, zone):
         return DU.detectZone(self.imageFiltreCourante, zone)
 
-	'''
+    '''
 	AnalyseImg :
 	--------------------------------------------
 	méthode qui permet de faire les analyses sur une image.
@@ -94,7 +94,7 @@ class Analyse:
 	zone : vrai si la zone observée (après fitrage) contient quelque chose (au moins un pixel blanc)
 	cerlce + zone : renvois les cercles dans la zone (avec leurs pourcentages de remplissage respectif)
 					Un cercle est considéré dans la zone si son centre est dans la zone.
-	'''
+    '''
 	#TODO : implémenter le paramètre dessin
 
     def AnalyseImg(self,thresh=None,zone=None,cercle=None,poteau=False,dessin=True) :#va contenir la nouvelle version
@@ -288,7 +288,7 @@ class Analyse:
         return angleX
 
 
-	#TODO : commenter
+    #TODO : commenter
     def meilleureBalle(self, listeBalles):
         meilleurCercle, meilleurPourcent = None, 0
         for (cercle,pourcent) in listeBalles:
@@ -297,11 +297,11 @@ class Analyse:
                 
         return meilleurCercle	
 
-	'''
+    '''
 	takeOk(self):
 	----------------------------
 	retourne vrai si la ball est aux bonnes coordonées pour être prise
-	'''
+    '''
     def takeOk(self):
 		#Pitch de la tête entre 25° Yaw = 0°
 		mh = Head(self.motion,self.posture)
@@ -316,16 +316,16 @@ class Analyse:
 		else :
 			return False
 
-		"""
+        """
 		#nouvelle version en cours de teste :
 		c = self.AnalyseMultiImage(zone=z,cercle=70,nb_img=5,nb_matching=3)
 		if c is not None:
 			return True
 		else :
 			return False
-		"""
+        """
 		
-
+		
     '''
 	VrtOk(self):
 	--------------------------
@@ -409,7 +409,7 @@ class Analyse:
 	---------------------------
 	retourne la zone où la balle doit être prise en fonction de la résolution
     '''
-    def getZoneTake(self):
+   	def getZoneTake(self):
 		width = self.camera.getResolution()[0]
 		
 		#ceci est la zone idéale pour la résolution kVGA :
@@ -428,21 +428,5 @@ class Analyse:
 			return DU.Zone((x//4,y//4),dx//4,dy//4)	
 		else :
 			return DU.Zone((x*2,y*2),dx*2,dy*2)
-			
-		"""
-		#version debug #TODO à retirer plus tard
-		if   width == 640 :
-			print "640"
-			return DU.Zone((x,y),dx)
-		elif width == 320 :
-			print "320"
-			return DU.Zone((x//2,y//2),dx//2)
-		elif width == 160 :
-			print "160"
-			return DU.Zone((x//4,y//4),dx//4)	
-		else :
-			print "1280"
-			return DU.Zone((x*2,y*2),dx*2)
-		"""
 
         
