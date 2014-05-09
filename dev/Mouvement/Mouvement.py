@@ -16,9 +16,6 @@ import a_croupis
 import relever
 
 
-IP = "192.168.1.3"
-PORT = 9559
-
 class Head:
 	def __init__(self,motion,posture):
 		self.motion = motion

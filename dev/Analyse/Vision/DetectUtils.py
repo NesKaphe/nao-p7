@@ -7,18 +7,47 @@ import time
 import math
 
 
-print "import OK"
-"""
-class Cercle :
-"""
-class Cercle:
-	def __init__(self, (x,y), rayon):
-		self.x = x
-		self.y = y
-		self.rayon = rayon
+'''
+classe Abstraite forme, pour la detection de forme
+'''
+class Forme(object):
+    def __init__(self, (x,y)):
+        self.x = x
+        self.y = y
 
-	def __str__(self):
-		return "(("+str(self.x)+","+str(self.y)+"),"+str(self.rayon)+")"
+    def getCentre(self):
+        raise NotImplementedError("La methode getCentre n'est pas implementé dans la classe abstraite Forme")
+
+
+'''
+class Cercle, pour la detection de balle
+'''
+class Cercle(Forme):
+    def __init__(self, (x,y), rayon):
+        super(Cercle,self).__init__((x-rayon,y-rayon))
+        self.rayon = rayon
+
+    def getCentre(self):
+        return (self.x+self.rayon, self.y+self.rayon)
+
+    def __str__(self):
+        return "(("+str(self.x)+","+str(self.y)+"),"+str(self.rayon)+")"
+
+
+'''
+class Rectangle, pour la detection de poteau
+'''
+class Rectangle(Forme):
+    def __init__(self, (x,y), cote1, cote2):
+        super(Rectangle,self).__init__((x,y))
+        self.cote1 = cote1
+        self.cote2 = cote2
+
+    def getCentre(self):
+        return (self.x+self.cote1, self.y+self.cote2)
+
+    def __str__(self):
+        return "(("+str(self.x)+","+str(self.y)+"),"+str(self.cote1)+","+str(self.cote2)+")"
 
 
 """
@@ -39,12 +68,13 @@ class Zone():
 		return "("+str(self.x)+","+str(self.y)+"), dx:"+str(self.dx)+" dy:"+str(self.dy)
 
 		
-	def isIn(self,cercle):#prend le centre d'un cercle et répond si le cercle est dans la zone
-		testX = (cercle.x >= self.x) and (cercle.x <= self.x+self.dx)#on évide de dupliquer le teste
+	def isIn(self,forme):#prend le centre d'un cercle et répond si le cercle est dans la zone
+		centre = forme.getCentre()
+		testX = (centre[0] >= self.x) and (centre[0] <= self.x+self.dx)#on évide de dupliquer le teste
 		if self.dy is not None :
-			return testX and (cercle.y >= self.y) and (cercle.y <= self.y+self.dy)
+			return testX and (centre[1] >= self.y) and (centre[1] <= self.y+self.dy)
 		else :
-			return testX and (cercle.y >= self.y) and (cercle.y <= self.y+self.dx)
+			return testX and (centre[1] >= self.y) and (centre[1] <= self.y+self.dx)
 
 
 
@@ -219,13 +249,12 @@ def multipleUnionSucc (imgs):
 
 	return im_result
 
-
-#########NOUVELLES fonctions
-
-
 	
-
-#retourne vrai si la zone contient au moins un px blanc
+'''
+detectZone (thresh,zone):
+---------------------------------
+retourne vrai si la zone contient au moins un px blanc
+'''
 def detectZone (thresh,zone):
 	x_max = thresh.shape[0]
 	y_max = thresh.shape[1]
@@ -238,11 +267,15 @@ def detectZone (thresh,zone):
 				return True
 	
 	return False #on a rien trouvé dans la zone
-			
+		
 #prend une img et dessine le cercle dedans
 def dessineCercle(img,cercle):
-	cv2.circle(img,(cercle.x,cercle.y),cercle.rayon,(0,255,255),2)
-	
+	cv2.circle(img,cercle.getCentre(),cercle.rayon,(0,255,255),2)
+
+#prend une img et dessine le rectangle dedans
+def dessineRectangle(img,rectangle):
+	cv2.rectangle(img,rectangle.getCentre(),(rectangle.cote1, rectangle.cote2),(0,255,255),2)
+
 #prend une img et dessine la zone dedans
 def dessineZone(img,z):
 	cv2.rectangle(img,(z.x,z.y),(z.x+z.dx,z.y+z.dy),(0,256,0),2)
@@ -276,7 +309,7 @@ def detectCercle(thresh, pourcentage):
 
 	return []
 
-
+#TODO : commenter
 def detecteCercleHough(thresh):
 	circles = cv2.HoughCircles(thresh.copy(),
 				   cv.CV_HOUGH_GRADIENT,2,15,param1=200,
@@ -288,17 +321,38 @@ def detecteCercleHough(thresh):
 		    cercle = Cercle(i[0],i[1])
 		    liste.append(cercle)
         return liste
+        
+#TODO : commenter
+def detectePoteau(thresh):
+	contours = cv2.findContours(thresh.copy(),
+				    cv.CV_RETR_EXTERNAL,
+				    cv.CV_CHAIN_APPROX_NONE)[0]
+	if contours != None:
+		liste = []
+		for i in contours:
+			approx = cv2.approxPolyDP(i,0.02*cv2.arcLength(i,True),True)
+			if len(approx) == 4 and cv2.isContourConvex(approx) and cv2.contourArea(approx) > 0:
+				rect = cv2.minAreaRect(approx)
+				box = cv2.cv.BoxPoints(rect)
+				box = np.int0(box)
+				(x,y) = box[0]
+				(w, h) = box[1]
+				rectangle = Rectangle((int(x),int(y)),int(w),int(h))
+				liste.append(rectangle)
 
+		return liste
+	return []
 
+#TODO : commenter
 def distanceDuCentre(cercle, (centreX, centreY)):
 	#Le repère du nao est inversé donc on multipliera par -1
 	vectX = (cercle.x - centreX) * -1
 	vectY = (cercle.y - centreY) * -1
 	return vectX, vectY
 
-
+#TODO : commenter
 def pxToRad(distance, pxVision):
-	angleVision = math.radian(60)
+	angleVision = math.radians(60)
 	
 	pxToAngle = angleVision/pxVision
 
@@ -310,7 +364,5 @@ mettre en paramètre un couple de points
 '''
 def distance(c1,c2):
 	math.sqrt( math.pow(c1.x-c2.x,2) + math.pow(c1.y-c2.y,2) )
-
-
 
 

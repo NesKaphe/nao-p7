@@ -31,15 +31,14 @@ class Analyse:
         self.pourcentage = 70
         
         #nom du filtre de la balle
-        self.bfname = "Balle"#balle filtrer name #TODO trouver un moyen de directement le recuperer dans le fichier
-        
+        self.BalleOmbreCamHaut = "BalleOmbre0"#balle filtrer name #TODO trouver un moyen de directement le recuperer dans le fichier
+        self.BalleLumiereCamHaut = "BalleLumiere1"
 
-    def createProxies(self):#TODO : à retirer
-        #A changer par des paramètres dans un fichier de config
-        self.videoProxy = ALProxy("ALVideoDevice", "192.168.1.3", 9559)#TODO utiliser Decision pour récupérer l'IP et port (ou autre fichier si changement)
-
+        self.BalleOmbreCamBas = "BalleOmbre1"
+        self.BalleLumiereCamBas = "BalleLumiere1" 
+        self.imageCourante = None
     
-    def switchCamera(self):#TODO pourquoi ne pas faire un setCamBas et un setHaut ?
+    def switchCamera(self):
         self.camera.switchCamera()
 
     def setCameraHaut(self):
@@ -57,135 +56,24 @@ class Analyse:
         centreX = resX / 2
         centreY = resY / 2
         return centreX, centreY
-    
-	#TODO : cette méthode n'a pas beaucoup d'intéret !
-	#possibilité de faire : return self.camera.getResolution()
-    def getPxVision(self):
-        resolution = self.camera.getResolution()
-        return resolution
-
-
-    '''
-    calculPourcentage: Calcule un pourcentage de remplissage de l'objet par rapport a son cercle
-    circonscrit
-    '''
-    #A changer pour une meilleure précision
-    def calculPourcentage(self, rayon, contour):
-        aire_objet = cv2.contourArea(contour)
-        aire_cercle = math.pi*rayon*rayon
-        return (aire_objet/aire_cercle)*100
-
-    '''
-    ChercheBalles: Va chercher tous les objets ressemblant à une balle dans une image
-    capturée par la caméra du Nao et renvoie une liste de la forme (centre, rayon)
-    -centre est un couple de la forme (x,y)
-    '''
-    #Renvoie une liste de la forme : (centre,rayon)
-    def ChercheBalles(self):#TODO à retirer utiliser AnalyseImg ou AnalyseMultiImg
-		#On commence par recuperer une image venant de nao
-		self.imageCourante = self.camera.getNewImage()
-
-		#On change de colorspace (BGR -> HSV)
-		imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)
-
-		#On demande a notre filtre de filtrer l'image pour la balle
-		#Changer le parametre nom de balle avec un fichier de config (a faire)
-		self.imageFiltreCourante = self.filtre.filtrer(imageHSV, self.bfname)
-
-		liste = []
-		contours = cv2.findContours(self.imageFiltreCourante.copy(),cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
-		if contours is not None:
-			for i in contours:
-				approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
-				(x,y),rayon = cv2.minEnclosingCircle(approx)
-				centre = (int(x),int(y))
-				rayon = int(rayon)
-				pourcent = self.calculPourcentage(rayon,i)
-				if pourcent > self.pourcentage:
-					liste.append(((centre,rayon), pourcent))
-
-		return liste
-  
-    '''
-    ChercheBallesV2(self):
-    version 2 avec plusieurs images
-    utilisation de la fonction union et multiunion
-    '''
-
-    def ChercheBallesV2(self):#TODO à retirer car pas utilisé
-		#On commence par recuperer une image venant de nao
-		self.imgs = self.camera.getMultipleImages(nbImages= 3,pauseCapture = 50)
-		
-		#On change de colorspace (BGR -> HSV)
-		self.imgsHSV = self.camera.multiHSVConvert(imgs)#TODO changer camera par filtre
-
-		#On demande a notre filtre de filtrer l'image pour la balle
-		#Changer le parametre nom de balle avec un fichier de config (a faire)
-			
-		self.imgsFiltre = self.filtre.multipleFilter(self.imgsHSV, self.bfname)
-		mu = multipleUnion (imgsFiltre) #version 1 
-		#mus = multipleUnionSucc (imgsFiltre)#version 2 #TODO a tester 
-
-		contours = cv2.findContours(mu,cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
-		liste = []#liste des endroits ou est suppose se trouver la balle
-
-		if contours != None:
-			for i in contours:
-			            approx = cv2.approxPolyDP(i,0.1*cv2.arcLength(i,True),True)
-			            (x,y),rayon = cv2.minEnclosingCircle(approx)
-			            centre = (int(x),int(y))
-			            rayon = int(rayon)
-			            pourcent = self.calculPourcentage(rayon,i)
-			            if pourcent > self.pourcentage:
-			                liste.append(((centre,rayon), pourcent))
-
-		#TODO -- faire une methode spécialement dédidé à la detection de contours
-		#réintroduire la detection avec HougthCircle
-
-		return liste
-        
-    '''
-    BallPosition: 
-    Va retourner :
-    - Un vecteur de direction par rapport au centre de l'image vers l'objet ayant le plus 
-    de ressemblance avec une Balle (Si au moins une balle est detectée)
-    - None si aucune balle n'a été trouvée dans l'image
-    '''
-    def BallPosition(self):#TODO à retirer VRAIMENT!!!
-        listeBalles = self.ChercheBalles()
-        if len(listeBalles) > 0:
-            meilleure = listeBalles[0]
-            for cercle in listeBalles:
-                cv2.circle(self.imageCourante,cercle[0][0],cercle[0][1],(0,255,255),2)
-                if meilleure[1] < cercle[1]: #On compare les pourcentages
-                    meilleure = cercle
-             
-            posX = meilleure[0][0][0]
-            posY = meilleure[0][0][1]
-            
-            centreX, centreY = self.getCentreImage()
-            print "La balle est a la position : ",(posX,posY), "de l'image"
-	    resX = posX - centreX
-	    resY = posY - centreY
-            return resX, resY
-        else:
-            return None
-
-
 
 
 
     '''
     afficheImagesCourantes: Permet d'afficher l'image courante traitée par l'analyse à l'écran
+    note : exception si l'image n'est pas initialisé
     '''
-    #TODO mettre imageCourante et l'autre dans __init__
-    #problème ça marche pas si on à fait aucun traitement faire un affichage quand même avec se que l'ont a
-    #ajouter le paramètre 0 ou 1 pour avoir image du haut ou du bas (a voir )
     def afficheImagesCourantes(self):
+    	if self.imageCourante is None:
+    		raise NameError("image courante non initialisé")
         cv2.imshow("Original",self.imageCourante)
         cv2.imshow("Filtre",self.imageFiltreCourante)
         cv2.waitKey(1)
 
+
+	#TODO : commentaire
+    def testZone(self, zone):
+        return DU.detectZone(self.imageFiltreCourante, zone)
 
 	'''
 	AnalyseImg :
@@ -208,17 +96,38 @@ class Analyse:
 					Un cercle est considéré dans la zone si son centre est dans la zone.
 	'''
 	#TODO : implémenter le paramètre dessin
-    def AnalyseImg(self,thresh=None,zone=None,cercle=None,dessin=True) :#va contenir la nouvelle version
-	
-		if zone is None and cercle is None :
+
+    def AnalyseImg(self,thresh=None,zone=None,cercle=None,poteau=False,dessin=True) :#va contenir la nouvelle version
+    
+		if zone is None and cercle is None and poteau is not True :
 			raise NameError("pas de paramettres")
-		
+			
+		if poteau and cercle is not None and thresh is not None:
+            raise NameError("paramètres poteau et cercle non compatible")
+
+
 		#creation du thresh :
 		if thresh is None :
 			self.imageCourante = self.camera.getNewImage()
 			imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)
-			thresh = self.filtre.filtrer(imageHSV, self.bfname)
+			####VOIR si ça marche #################################################
+			if poteau:
+		        thresh = self.filtre.filtrer(imageHSV, self.poteauName)
+		    else:
+		        if self.camera.getActiveCamera() == 0:
+		            threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamHaut)
+		            threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamHaut)
+		            
+		        else :
+		            threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamBas)
+		            threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamBas)
+
+        		thresh = cv2.bitwise_or(threshOmbre, threshLumiere)
+			######################################################################	
+			
 			self.imageFiltreCourante = thresh
+			self.imageFiltreCourante = thresh
+		
 		
 		cerclesP = []#liste de cercles plus pourcentages
 		zones = []#va contenir la liste des objets dans la zone
@@ -253,7 +162,7 @@ class Analyse:
 		else :
 			return DU.detectZone(thresh,zone)
 	
-	
+
     '''
 	AnalyseMultiImage(self,thresh=None,zone=None,cercle=None,dessin=True,nb_img):
 	---------------------------------------------------------------------------
@@ -378,14 +287,16 @@ class Analyse:
         angleX = DU.pxToRad(vectX, pxVision[0])
         return angleX
 
-	#TODO : commenter
-	def meilleureBalle(self, listeBalles):
-		meilleurCercle, meilleurPourcent = None, 0
-		for (cercle,pourcent) in listeBalles:
-			if pourcent > meilleurPourcent:
-				meilleurCercle, meilleurPourcent = cercle, pourcent
 
-		return meilleurCercle	
+	#TODO : commenter
+    def meilleureBalle(self, listeBalles):
+        meilleurCercle, meilleurPourcent = None, 0
+        for (cercle,pourcent) in listeBalles:
+            if pourcent > meilleurPourcent:
+                meilleurCercle, meilleurPourcent = cercle, pourcent
+                
+        return meilleurCercle	
+
 	'''
 	takeOk(self):
 	----------------------------
@@ -413,6 +324,8 @@ class Analyse:
 		else :
 			return False
 		"""
+		
+
     '''
 	VrtOk(self):
 	--------------------------
@@ -531,3 +444,5 @@ class Analyse:
 			print "1280"
 			return DU.Zone((x*2,y*2),dx*2)
 		"""
+
+        

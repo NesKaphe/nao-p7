@@ -72,6 +72,8 @@ class Camera:
 		self.camera = 1
 		self.subscribe()
 
+	def getActiveCamera(self):
+		return self.camera
 
 	def getResolution(self):
 		if self.resolution == kQQVGA:
