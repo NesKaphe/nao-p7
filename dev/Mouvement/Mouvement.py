@@ -13,7 +13,7 @@ import time
 import almath
 import math#contien pi
 import a_croupis
-import relever
+#import relever
 
 
 IP = "192.168.1.3"
@@ -147,7 +147,4 @@ class Move :
 		self.motion.moveTo(0,0,math.pi)
 	
 	def turnTo(self,angle):
-		self.motion.move(0.1,0.1,0.1)
-                #self.motion.setWalkTargetVelocity(0.1,0.1,0.1,0.1)
-		#self.motion.moveTo(0.3,0,angle)
-		#self.motion.moveTo(1,0,0) #TODO: pour le test !!!!!
+		self.motion.moveTo(0,0,angle)

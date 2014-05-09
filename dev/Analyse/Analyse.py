@@ -30,8 +30,11 @@ class Analyse:
         self.pourcentage = 70
         
         #nom du filtre de la balle
-        self.bfname = "Balle"#balle filtrer name #TODO trouver un moyen de directement le recuperer dans le fichier
-        
+        self.BalleOmbreCamHaut = "BalleOmbre0"#balle filtrer name #TODO trouver un moyen de directement le recuperer dans le fichier
+        self.BalleLumiereCamHaut = "BalleLumiere1"
+
+        self.BalleOmbreCamBas = "BalleOmbre1"
+        self.BalleLumiereCamBas = "BalleLumiere1" 
 
     def createProxies(self):#TODO : à retirer
         #A changer par des paramètres dans un fichier de config
@@ -113,19 +116,22 @@ class Analyse:
 
     def ChercheBallesV2(self):#TODO à retirer
 		#On commence par recuperer une image venant de nao
-		self.imgs = self.camera.getMultipleImages(nbImages= 3,pauseCapture = 50)
-		
+                print "avant multipleCapture"
+		imgs = self.camera.getMultipleImages(nbImages= 3,pauseCapture = 0.01)
+		print "apres multiple capture"
 		#On change de colorspace (BGR -> HSV)
-		self.imgsHSV = self.camera.multiHSVConvert(imgs)
-
+                print "avant hsv"
+		imgsHSV = self.filtre.multiHSVConvert(imgs)
+                print "apres hsv"
 		#On demande a notre filtre de filtrer l'image pour la balle
 		#Changer le parametre nom de balle avec un fichier de config (a faire)
 			
-		self.imgsFiltre = self.filtre.multipleFilter(self.imgsHSV, self.bfname)
-
-                mu = multipleUnion (imgsFiltre)#version 1 
+		imgsFiltre = self.filtre.multipleFilter(imgsHSV, self.bfname)
+                print "avant multipleUnion"
+                mu = DU.multipleUnion (imgsFiltre)#version 1 
+                print "apres"
 		#mus = multipleUnionSucc (imgsFiltre)#version 2 #TODO a tester 
-
+                '''
 		contours = cv2.findContours(mu,cv.CV_RETR_EXTERNAL ,cv.CV_CHAIN_APPROX_NONE)[0]
 		liste = []#liste des endroits ou est suppose se trouver la balle
 
@@ -143,6 +149,8 @@ class Analyse:
 		#réintroduire la detection avec HougthCircle
 
 		return liste
+                '''
+                return DU.detectCercle(mu,50)
         
     '''
     BallPosition: Va retourner :
@@ -186,6 +194,8 @@ class Analyse:
         cv2.waitKey(1)
 
 
+    def testZone(self, zone):
+        return DU.detectZone(self.imageFiltreCourante, zone)
 
 	'''
 	AnalyseImg :
@@ -207,15 +217,32 @@ class Analyse:
 					Un cercle est considéré dans la zone si son centre est dans la zone.
 	'''
 	#TODO : implémenter le paramètre dessin
-    def AnalyseImg(self,zone=None,cercle=None,dessin=True) :#va contenir la nouvelle version
+    def AnalyseImg(self,zone=None,cercle=None,poteau=False,dessin=True) :#va contenir la nouvelle version
 	
-		if zone is None and cercle is None :
+		if zone is None and cercle is None and poteau is not True :
 			raise NameError("pas de paramettres")
 		
+                if poteau and cercle is not None:
+                    raise NameError("paramètres poteau et cercle non compatible")
+
 		#mise creation du thresh :
 		self.imageCourante = self.camera.getNewImage()
 		imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)
-		thresh = self.filtre.filtrer(imageHSV, self.bfname)
+
+                thresh = None
+
+                if poteau:
+                    thresh = self.filtre.filtrer(imageHSV, self.poteauName)
+                else:
+                    if self.camera.getActiveCamera() == 0:
+                        threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamHaut)
+                        threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamHaut)
+                        
+                    else :
+                        threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamBas)
+                        threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamBas)
+
+                thresh = cv2.bitwise_or(threshOmbre, threshLumiere)
 		self.imageFiltreCourante = thresh
 		
 		cerclesP = []#liste de cercles plus pourcentages
@@ -249,6 +276,13 @@ class Analyse:
 				return cerclesP
 		else :
 			return DU.detectZone(thresh,zone)
+                '''
+                elif poteau is True:
+                    rectangles = DU.detectRectangle(self.imageCourante)
+                    
+                    for r in regtangles :
+                        DU.dessineRectangle(self.imageCourante,r)
+                '''
 		
 	#TODO : commenter !!!!!!
 	#COMMENT : problème cette distance au centre ne ce fait que avec des cercles 
@@ -266,13 +300,13 @@ class Analyse:
         return angleX
 
 
-	def meilleureBalle(self, listeBalles):
-		meilleurCercle, meilleurPourcent = None, 0
-		for (cercle,pourcent) in listeBalles:
-			if pourcent > meilleurPourcent:
-				meilleurCercle, meilleurPourcent = cercle, pourcent
-
-		return meilleurCercle	
+    def meilleureBalle(self, listeBalles):
+        meilleurCercle, meilleurPourcent = None, 0
+        for (cercle,pourcent) in listeBalles:
+            if pourcent > meilleurPourcent:
+                meilleurCercle, meilleurPourcent = cercle, pourcent
+                
+        return meilleurCercle	
 	'''
 	takeOk(self):
 	----------------------------
@@ -348,3 +382,5 @@ class Analyse:
 			print "1280"
 			return DU.Zone((x*2,y*2),dx*2)
 		"""
+
+        
