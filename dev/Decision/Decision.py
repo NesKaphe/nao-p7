@@ -25,19 +25,22 @@ class Decision:
         
         self.initialisation()
         #self.a.filtre.calibrage()
+        """
+        #TEST CLEMENT
         self.modePositionneBalle()
         self.modePrendreBalle()
         #self.modeRechercheBalle()
         """
 		#teste Alain
-        cameraFinRecherche = self.modeRecherche()
+        pourcentageRecherche = 70
+        cameraFinRecherche = self.modeRecherche(pourcentage=pourcentageRecherche)
         while self.marcheVersBalle(cameraFinRecherche) == False:
             print "On a perdu la balle... il faut rechercher a nouveau la balle"
-            cameraFinRecherche = self.modeRecherche()
+            pourcentageRecherche -= 20
+            cameraFinRecherche = self.modeRecherche(pourcentage=pourcentageRecherche)
         
         print "On doit maintenant essayer de s'approcher de la balle"
         self.a.afficheImagesCourantes() #petit affichage pour voir
-        """
 
     def routine (self):
         #phase de calibrage
@@ -100,9 +103,10 @@ class Decision:
             centre = False
 
             if camera == 0:
-                cerclesP = self.a.AnalyseImg(zone_camera_haut, cercle=60)
+                #cerclesP = self.a.AnalyseImg(zone=zone_camera_haut, cercle=60)
                 self.a.afficheImagesCourantes()
-                balle = self.a.meilleureBalle(cerclesP)
+                #balle = self.a.meilleureBalle(cerclesP)
+                balle = self.a.AnalyseMultiImage(zone=zone_camera_haut, cercle=60)
                 #centre = self.a.testZone(zoneCentre_camera_haut)
                 print balle
                 if balle is not None:
@@ -110,9 +114,10 @@ class Decision:
                 else:
                     centre =  False
             else:
-                cerclesP = self.a.AnalyseImg(cercle=60)
+                #cerclesP = self.a.AnalyseImg(cercle=60)
                 self.a.afficheImagesCourantes()
-                balle = self.a.meilleureBalle(cerclesP)
+                #balle = self.a.meilleureBalle(cerclesP)
+                balle = self.a.AnalyseMultiImage(cercle=60)
                 #centre = self.a.testZone(zoneCentre_camera_bas)
                 print balle
                 if balle is not None:
@@ -153,7 +158,7 @@ class Decision:
                             self.a.switchCamera() #On passe maintenant a la camera du bas
                             camera = 1
                             nbSpeculations = nbSpeculationsTotal
-                            nbSpeculationsCentre = nbSpeculationsTotalCentre
+                            #nbSpeculationsCentre = nbSpeculationsTotalCentre
                             continue #On recommence la boucle après notre changement de camera
                         else: #On a completement perdu la balle, on renvoie False car il faut repasser en mode recherche de balle
                             self.motion.stopMove()
@@ -217,7 +222,7 @@ class Decision:
 	-----------------------------------------
 	mode qui permet de rerchercher la balle autour du robot ou les poteaux
     '''
-    def modeRecherche(self, typeRecherche="balle"):
+    def modeRecherche(self, typeRecherche="balle", pourcentage=70):
 
 	#tourner en rond sur lui meme jusqu'à trouver la balle
         #alterner entre camera du haut et camera du bas entre chaque position
@@ -228,14 +233,13 @@ class Decision:
         #une fois la balle trouvée, tourner le robot le plus possible vers la balle
 
         if typeRecherche != "balle" and typeRecherche != "poteau":
-            print "[modeRecherche] : Type inconnu : ", typeRecherche
+            print "[modeRecherche] : Type de recherche inconnu : ", typeRecherche
             raise Exception
 
         cameraNao = 0
         self.a.setCameraHaut() #On commence la recherche avec la camera du haut
         mh = Head(self.motion,self.posture)
         mo = Move(self.motion,self.posture)
-        pourcentage = 80
         self.initialisation()
         #self.a.filtre.calibrage(0)
         #self.a.filtre.calibrage(1)
@@ -251,6 +255,7 @@ class Decision:
         while trouve is not True:
         	#TODO : remplacer par AnalyseMultiImg !! AVOIR !!
         	#----------------------------------------
+            """
             nbImages = 5
             while nbImages > 0:
                 if cameraNao == 0:
@@ -263,10 +268,19 @@ class Decision:
                     balle = self.a.meilleureBalle(cerclesP)
                     break
                 nbImages -= 1
-			#----------------------------------------
-			#----------------------------------------
+            """
+            
+            if cameraNao == 0:
+                balle = self.a.AnalyseMultiImage(zone=zone_camera_haut, cercle=pourcentage, nb_matching=3)
+            else:
+                balle = self.a.AnalyseMultiImage(cercle=pourcentage, nb_matching=3)
+            
+            if balle is not None:
+                trouve = True
+                 #----------------------------------------
+                 #----------------------------------------
             if not trouve:
-
+                self.a.afficheImagesCourantes()
                 if cameraNao == 0:
                     self.a.switchCamera()
                     cameraNao += 1

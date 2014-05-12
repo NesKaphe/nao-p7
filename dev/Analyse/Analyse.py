@@ -69,7 +69,7 @@ class Analyse:
     		raise NameError("image courante non initialisé")
         cv2.imshow("Original",self.imageCourante)
         cv2.imshow("Filtre",self.imageFiltreCourante)
-        cv2.waitKey(1)
+        cv2.waitKey(33)
 
 
     #TODO : commentaire
@@ -116,17 +116,19 @@ class Analyse:
 				thresh = self.filtre.filtrer(imageHSV, self.poteauName)
 			else:
 				if self.camera.getActiveCamera() == 0:
-					threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamHaut)
+					#threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamHaut)
 					threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamHaut)
 				else :
-					threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamBas)
+					#threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamBas)
 					threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamBas)
 
-				thresh = cv2.bitwise_or(threshOmbre, threshLumiere)
+				#thresh = cv2.bitwise_or(threshOmbre, threshLumiere)
+                                thresh = threshLumiere
+                                #TEST SANS LES THRESH OMBRE
 			######################################################################	
-			
+
 			self.imageFiltreCourante = thresh
-			self.imageFiltreCourante = thresh
+                        
 		
 		
 		cerclesP = []#liste de cercles plus pourcentages
@@ -181,7 +183,7 @@ class Analyse:
 	est longue
     '''
 	
-    def AnalyseMultiImage(self,thresh=None,zone=None,cercle=None,dessin=True,nb_img=5,nb_matching=2):
+    def AnalyseMultiImage(self,thresh=None,zone=None,cercle=None,poteau=False, dessin=True,nb_img=5,nb_matching=2):
 	
 		if nb_matching > nb_img :
 			raise NameError ("nb_matching > nb_img")
@@ -191,7 +193,7 @@ class Analyse:
 		#on retourne vrai si on détecte au moins un px blanc dans la zone
 		if zone is not None   and   cercle is None :
 			for i in range(nb_img):
-				if self.AnalyseImg(thresh,zone,cercle,dessin) == True :
+				if self.AnalyseImg(None,zone,cercle,poteau,dessin) == True :
 					return True
 			return False	
 		
@@ -201,7 +203,7 @@ class Analyse:
 		#on analyse plusieurs images :
 		detect_cercles = [] #contient tout les cercles détecté
 		for i in range(nb_img):
-			detect_cercles += self.AnalyseImg(thresh,zone,cercle,dessin)#ajout de nouveaux résultats dans "c" sur de nouvelles images
+			detect_cercles += self.AnalyseImg(None,zone,cercle,poteau,dessin)#ajout de nouveaux résultats dans "c" sur de nouvelles images
 		
 		#si on a aucun cercles on ne peux rien faire
 		if not detect_cercles :
@@ -282,7 +284,7 @@ class Analyse:
 	#le cercle dans l'iage
     def getAngle(self, cercle):
         centre = self.getCentreImage()
-        pxVision = self.getPxVision()
+        pxVision = self.camera.getResolution() #self.getPxVision()
         vectX, vectY = DU.distanceDuCentre(cercle,centre)#mm commentaire
         angleX = DU.pxToRad(vectX, pxVision[0])
         return angleX
