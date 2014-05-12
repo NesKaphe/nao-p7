@@ -32,10 +32,11 @@ class Analyse:
         
         #nom du filtre de la balle
         self.BalleOmbreCamHaut = "BalleOmbre0"#balle filtrer name #TODO trouver un moyen de directement le recuperer dans le fichier
-        self.BalleLumiereCamHaut = "BalleLumiere1"
+        self.BalleLumiereCamHaut = "BalleLumiere0"
 
         self.BalleOmbreCamBas = "BalleOmbre1"
         self.BalleLumiereCamBas = "BalleLumiere1" 
+        self.poteauName= "poteauBleu"
         self.imageCourante = None
     
     def switchCamera(self):
