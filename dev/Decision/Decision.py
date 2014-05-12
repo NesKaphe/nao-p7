@@ -24,7 +24,7 @@ class Decision:
         self.a = Analyse(self.videoProxy, self.motion, self.posture, camera=0)
         
         self.initialisation()
-        #self.a.filtre.calibrage()
+        self.a.filtre.calibrage()
         """
         #TEST CLEMENT
         self.modePositionneBalle()
@@ -73,28 +73,33 @@ class Decision:
     marcheVersBalle va avancer jusqu'a ce que la balle soit totalement perdue
     Ce mode va chercher a faire une approche grossière jusqu'a la balle
     '''
-    def marcheVersBalle(self, cameraDebut = 0):
-        camera = cameraDebut #On va commencer avec la camera demandée en paramètre
-        if camera == 0:
-            self.a.setCameraHaut()
-        else:
-            self.a.setCameraBas()
+    def marcheVersBalle(self, zone_marche = None):
+        camera = self.a.camera.getActiveCamera() 
 
         resolution = self.a.camera.getResolution()
         '''
         ZONES
         '''
+        zoneBas_camera_haut = DU.Zone((0, (5 * resolution[1]/6)), resolution[0], resolution[1]/6)
+
         #Zones de recherche globale de la balle
-        zone_camera_haut = DU.Zone((0,resolution[1]/2), resolution[0], resolution[1] /2 )
-        zoneBas_camera_bas = DU.Zone((0, (4 * resolution[1])/5), resolution[0], resolution[1]/5)
+        if zone_marche is None:
+            zone_camera_haut = DU.Zone((0,resolution[1]/2), resolution[0], resolution[1] /2 )
+        else:
+            if zone_marche.y > zoneBas_camera_haut:
+                zone_camera_haut = zone_marche
+
+        
+
+        zoneBas_camera_bas = DU.Zone((0, (5 * resolution[1])/6), resolution[0], resolution[1]/5)
         
         #Zone centrale que l'on regardera en priorité durant la marche vers la balle
-        zoneCentre_camera_haut = DU.Zone((resolution[0]/3, resolution[1]/2), resolution[0]/3, resolution[1]/2)
-        zoneCentre_camera_bas  = DU.Zone((resolution[0]/3, 0), resolution[0]/3, resolution[1])
+        zoneCentre_camera_haut = DU.Zone((2 * resolution[0]/4, resolution[1]/2), resolution[0]/4, resolution[1]/2)
+        zoneCentre_camera_bas  = DU.Zone((2 * resolution[0]/4, 0), resolution[0]/4, resolution[1])
 
         angle = 0
         cerclesP = []
-        nbSpeculationsTotalCentre = 2 #Le nombre de fois qu'on fera comme si on avait vu la balle dans le cas ou on n'en voit pas durant l'analyse
+        nbSpeculationsTotalCentre = 1 #Le nombre de fois qu'on fera comme si on avait vu la balle dans le cas ou on n'en voit pas durant l'analyse
         nbSpeculationsTotal = 0
         nbSpeculations = nbSpeculationsTotal
         nbSpeculationsCentre = nbSpeculationsTotalCentre
@@ -128,6 +133,19 @@ class Decision:
 
             #On va essayer de chercher au centre dans un premier temps
             if centre:
+                if zoneBas_camera_bas.isIn(balle) and camera == 1:
+                    #On s'est rapproché de la balle, on arrete de marcher et on renvoie True
+                    self.motion.stopMove()
+                    return True
+               
+                elif zoneBas_camera_haut.isIn(balle) and camera == 0:
+                    #on va changer de camera car la balle va passer dans le champ de vision de la camera du bas
+                    print "Je change de camera car je peux continuer avec la camera du bas"
+                    self.a.switchCamera()
+                    camera = 1
+                    nbSpeculations = nbSpeculationsTotal
+                    nbSpeculationsCentre = nbSpeculationsTotalCentre
+
                 print "La balle est au centre de l'image donc je vais tout droit"
                 nbSpeculationsCentre = nbSpeculationsTotalCentre
                 angle = 0
@@ -135,8 +153,8 @@ class Decision:
             else: #Sinon, on va voir dans l'image où est la balle
                 if nbSpeculationsCentre <= 0: #On a regardé trop longtemps le centre uniquement
                     print "Je n'ai pas vu la balle au centre, je vais tenter de me redresser"
-                    print cerclesP
-                    if cerclesP != []:
+                    print balle
+                    if balle is not None:
                         nbSpeculations = nbSpeculationsTotal #On remet notre compteur de speculation à l'état initial
                         nbSpeculationsCentre = nbSpeculationsTotalCentre
                     
@@ -144,7 +162,14 @@ class Decision:
                     #On s'est rapproché de la balle, on arrete de marcher et on renvoie True
                             self.motion.stopMove()
                             return True
-                    
+                        elif zoneBas_camera_haut.isIn(balle) and camera == 0:
+                            #on va changer de camera
+                            print "Je change de camera car je peux continuer avec la camera du bas"
+                            self.a.switchCamera()
+                            camera = 1
+                            nbSpeculations = nbSpeculationsTotal
+                            nbSpeculationsCentre = nbSpeculationsTotalCentre
+
                         angle = self.a.getAngle(balle)
                         print "Balle vue !"
                     else: 
@@ -164,7 +189,7 @@ class Decision:
                             self.motion.stopMove()
                             return False
                 else: #On retire une boucle de verification du centre
-                    print "Je n'ai pas vu la balle devant moi, mais je continue quand même"
+                    print "Je n'ai pas vu la balle au centre, mais je continue quand même"
                     nbSpeculationsCentre -= 1
                     angle = 0 #On va aller tout droit
 
@@ -334,8 +359,11 @@ class Decision:
         mh.reset() #on remet la tete droite
         #on tourne le corps
         mo.turnTo(angleBalleImage + angleYaw)
-        
-        return cameraNao
+        haut_zone = balle.y - 20
+        if haut_zone < 0:
+            haut_zone = 0
+        zone_marche = DU.Zone((0, haut_zone), resolution[0], (resolution[1] - haut_zone))
+        return zone_marche
 
 
 

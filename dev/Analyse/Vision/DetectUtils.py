@@ -24,11 +24,11 @@ class Cercle, pour la detection de balle
 '''
 class Cercle(Forme):
     def __init__(self, (x,y), rayon):
-        super(Cercle,self).__init__((x-rayon,y-rayon))
+        super(Cercle,self).__init__((x,y))
         self.rayon = rayon
 
     def getCentre(self):
-        return (self.x+self.rayon, self.y+self.rayon)
+        return (self.x, self.y)
 
     def __str__(self):
         return "(("+str(self.x)+","+str(self.y)+"),"+str(self.rayon)+")"
