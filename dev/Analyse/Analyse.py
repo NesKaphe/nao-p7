@@ -31,12 +31,11 @@ class Analyse:
         self.pourcentage = 70
         
         #nom du filtre de la balle
-        self.BalleOmbreCamHaut = "BalleOmbre0"#balle filtrer name #TODO trouver un moyen de directement le recuperer dans le fichier
-        self.BalleLumiereCamHaut = "BalleLumiere0"
+        self.BalleCamHaut = "Balle0"#balle filtrer name #TODO trouver un moyen de directeme
 
-        self.BalleOmbreCamBas = "BalleOmbre1"
-        self.BalleLumiereCamBas = "BalleLumiere1" 
-        self.poteauName= "poteauBleu"
+        self.BalleCamBas = "Balle1"
+ 
+        self.poteauName= "poteau1"
         self.imageCourante = None
     
     def switchCamera(self):
