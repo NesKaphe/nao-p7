@@ -115,9 +115,9 @@ class Analyse:
 				thresh = self.filtre.filtrer(imageHSV, self.poteauName)
 			else:
 				if self.camera.getActiveCamera() == 0:
-					thresh = self.filtre.filtrer(imageHSV, self.BalleLumiereCamHaut)
+					thresh = self.filtre.filtrer(imageHSV, self.BalleCamHaut)
 				else :
-					thresh = self.filtre.filtrer(imageHSV, self.BalleLumiereCamBas)
+					thresh = self.filtre.filtrer(imageHSV, self.BalleCamBas)
 	
 
 			self.imageFiltreCourante = thresh

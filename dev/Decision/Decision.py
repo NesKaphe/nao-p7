@@ -24,7 +24,7 @@ class Decision:
         self.a = Analyse(self.videoProxy, self.motion, self.posture, camera=0)
         
         self.initialisation()
-        self.a.filtre.calibrage()
+        #self.a.filtre.calibrage()
 
         """
         #TEST CLEMENT
