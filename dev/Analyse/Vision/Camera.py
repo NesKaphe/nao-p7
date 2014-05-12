@@ -32,6 +32,7 @@ class Camera:
 	La destruction de l'objet camera entrainera la désinscription du module au nao
 	'''
 	def __del__(self):
+		print "desinscription caméra"
 		self.unsubscribe()
 
 	

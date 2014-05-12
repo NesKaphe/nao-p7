@@ -24,11 +24,11 @@ class Cercle, pour la detection de balle
 '''
 class Cercle(Forme):
     def __init__(self, (x,y), rayon):
-        super(Cercle,self).__init__((x-rayon,y-rayon))
+        super(Cercle,self).__init__((x,y))
         self.rayon = rayon
 
     def getCentre(self):
-        return (self.x+self.rayon, self.y+self.rayon)
+        return (self.x, self.y)
 
     def __str__(self):
         return "(("+str(self.x)+","+str(self.y)+"),"+str(self.rayon)+")"
@@ -277,8 +277,8 @@ def dessineRectangle(img,rectangle):
 	cv2.rectangle(img,rectangle.getCentre(),(rectangle.cote1, rectangle.cote2),(0,255,255),2)
 
 #prend une img et dessine la zone dedans
-def dessineZone(img,z):
-	cv2.rectangle(img,(z.x,z.y),(z.x+z.dx,z.y+z.dy),(0,256,0),2)
+def dessineZone(img,z,color=(0,256,0)):
+	cv2.rectangle(img,(z.x,z.y),(z.x+z.dx,z.y+z.dy),color,2)
 
 
 #pour calculer le taux de remplissage du cercle
