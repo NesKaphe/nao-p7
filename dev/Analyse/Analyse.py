@@ -111,21 +111,15 @@ class Analyse:
 		if thresh is None :
 			self.imageCourante = self.camera.getNewImage()
 			imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)
-			####VOIR si ça marche #################################################
+
 			if poteau:
 				thresh = self.filtre.filtrer(imageHSV, self.poteauName)
 			else:
 				if self.camera.getActiveCamera() == 0:
-					#threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamHaut)
-					threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamHaut)
+					thresh = self.filtre.filtrer(imageHSV, self.BalleLumiereCamHaut)
 				else :
-					#threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamBas)
-					threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamBas)
-
-				#thresh = cv2.bitwise_or(threshOmbre, threshLumiere)
-                                thresh = threshLumiere
-                                #TEST SANS LES THRESH OMBRE
-			######################################################################	
+					thresh = self.filtre.filtrer(imageHSV, self.BalleLumiereCamBas)
+	
 
 			self.imageFiltreCourante = thresh
                         
