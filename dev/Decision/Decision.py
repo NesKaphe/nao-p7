@@ -25,11 +25,14 @@ class Decision:
         
         self.initialisation()
         self.a.filtre.calibrage()
+
         """
         #TEST CLEMENT
-        self.modePositionneBalle()
-        self.modePrendreBalle()
+        #self.modePositionneBalle()
+        #print "PASSE EN MODE PRENDRE BALLE"
+        #self.modePrendreBalle()
         #self.modeRechercheBalle()
+
         """
 		#teste Alain
         pourcentageRecherche = 70
@@ -41,7 +44,41 @@ class Decision:
         
         print "On doit maintenant essayer de s'approcher de la balle"
         self.a.afficheImagesCourantes() #petit affichage pour voir
-
+		
+		
+        trouve = False
+        marche = True
+        position = False
+        fin = False
+        pourcentageRecherche = 70
+		
+		#TODO : ici proposer le calibrage
+        while fin is not True:
+			if trouve is False :
+				cameraFinRecherche = self.modeRecherche(pourcentage=pourcentageRecherche)
+				trouve = True
+				
+			if self.marcheVersBalle(cameraFinRecherche) is False  and   marche is True:
+				print "On a perdu la balle... il faut rechercher a nouveau la balle"
+				trouve = False
+				break
+			else :
+				marche = False
+			
+			
+			if self.modePositionneBalle() is False :
+				print "modePositionneBalle : balle perdu"
+				trouve = False
+				marche = True
+				position = False
+			else :
+				print "modePositionneBalle : "
+				position = True
+			
+			if position is True :
+				if self.modePrendreBalle() is False :
+					position = False
+			
     def routine (self):
         #phase de calibrage
         a = Analyse(self.videoProxy)
@@ -208,21 +245,17 @@ class Decision:
     '''
     def modePrendreBalle(self):#premiere vesion pour prendre la balle
 		mo = Move(self.motion,self.posture)
-		a = Analyse(self.videoProxy,self.motion,self.posture,camera=1)
+		self.a.setCameraBas()
 		
-		"""
-		#pour afficher la zone total
-		res = a.camera.getResolution()
-		print "la resolution est ",res
-		zo = DU.Zone((0,0),res[0],res[1])
-		print "la zone total =",zo
-		"""
+		cpt = 0
 		
-		mo.deboutMarche()
-		while not a.takeOk() :
+		while not self.a.takeOk() :
 			print "je ne peux pas prendre la balle"
-			a.afficheImagesCourantes()
-			cv2.waitKey(0)
+			#self.a.afficheImagesCourantes()
+			#cv2.waitKey(0)
+			cpt+=1
+			if cpt > 30 :
+				return False
 		print "je peux prendre la balle!"
 		mo.aCroupris()#TODO modifier l'angle de tete pour 
 		print "ici je dois prendre la balle!!"
@@ -237,8 +270,8 @@ class Decision:
 		mo.relever()
 		mo.fermeMain()
 		#ici il faudrait faire une fonction check hand (verif main) 
-
-
+		return True
+		
 
 
 
@@ -418,7 +451,7 @@ class Decision:
 				#sortir si on est ok
 				if h == "ok" and vert == "ok" :
 					print "position ok"
-					break
+					return True
 				
 				if cpt_bp >= cpt_max :
 					return False

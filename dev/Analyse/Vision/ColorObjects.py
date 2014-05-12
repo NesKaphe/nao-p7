@@ -14,6 +14,7 @@ class FilterColor:
 	def __init__(self):
 		self.objets = []
 		self.loadConfig()
+		
 
 	def loadConfig(self):
 		#Peut etre changer ca en mettant le path dans un fichier de config

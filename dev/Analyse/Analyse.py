@@ -342,8 +342,10 @@ class Analyse:
 		my_thresh = None
 		#on situe ou est la balle
 		self.camera.setCameraBas()
-		cercle = self.AnalyseMultiImage(thresh=my_thresh,cercle=70,nb_img=1,nb_matching=1)
 		
+		cercle = self.AnalyseMultiImage(thresh=my_thresh,cercle=70,nb_img=1,nb_matching=1)
+		DU.dessineZone(self.imageCourante,zone_v,color=(255,255,0))#dessiner la zone_v
+		DU.dessineZone(self.imageCourante,self.getZoneTake())
 		#debug : 
 		self.afficheImagesCourantes()		
 		#cv2.waitKey(0)
@@ -355,7 +357,7 @@ class Analyse:
 		if zone_v.isIn(cercle) :
 			return "ok"
 		else :
-			if zone_v.y < cercle.y :
+			if zone_v.x < cercle.x :
 				return "droite"
 			else :
 				return "gauche"
@@ -384,6 +386,8 @@ class Analyse:
 		self.camera.setCameraBas()
 		#cercle = self.AnalyseMultiImage(cercle=70,nb_img=1,nb_matching=1)
 		cercle = self.AnalyseMultiImage(cercle=70,nb_img=1,nb_matching=1)
+		DU.dessineZone(self.imageCourante,zone_h,color=(255,0,0))#dessiner la zone_h
+		DU.dessineZone(self.imageCourante,self.getZoneTake())
 		#debug : 
 		self.afficheImagesCourantes()		
 		#cv2.waitKey(0)
@@ -394,10 +398,10 @@ class Analyse:
 		if zone_h.isIn(cercle) :
 			return "ok"
 		else :
-			if zone_h.x < cercle.x :
-				return "avant"
-			else :
+			if zone_h.y < cercle.y :
 				return "arriere"
+			else :
+				return "avant"
 	
     '''
 	getZoneTake(self):
@@ -408,12 +412,10 @@ class Analyse:
 		width = self.camera.getResolution()[0]
 		
 		#ceci est la zone idéale pour la résolution kVGA :
-		#x = 145
-		#y = 320
-		x=187
-		y=205
-		dx = 40
-		dy = 40
+		x=87
+		y=295
+		dx = 30
+		dy = 30
 		
 		if   width == 640 :
 			return DU.Zone((x,y),dx,dy)

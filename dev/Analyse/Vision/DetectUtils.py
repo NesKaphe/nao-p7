@@ -277,8 +277,8 @@ def dessineRectangle(img,rectangle):
 	cv2.rectangle(img,rectangle.getCentre(),(rectangle.cote1, rectangle.cote2),(0,255,255),2)
 
 #prend une img et dessine la zone dedans
-def dessineZone(img,z):
-	cv2.rectangle(img,(z.x,z.y),(z.x+z.dx,z.y+z.dy),(0,256,0),2)
+def dessineZone(img,z,color=(0,256,0)):
+	cv2.rectangle(img,(z.x,z.y),(z.x+z.dx,z.y+z.dy),color,2)
 
 
 #pour calculer le taux de remplissage du cercle

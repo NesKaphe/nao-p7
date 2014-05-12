@@ -32,6 +32,7 @@ class Head:
 
 
 	def turnTo(self,angleYaw,anglePitch,speedX=1.5,speedY=1.5) :#va donner les angles directement a la tête (angle en radian)
+		print "debug - angle = ",angleYaw,"  ",anglePitch
 		self.motion.setStiffnesses("Head", 1.0)
 		names  = ["HeadYaw", "HeadPitch"]
 		angles = [angleYaw, anglePitch]
