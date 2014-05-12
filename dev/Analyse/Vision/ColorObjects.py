@@ -88,6 +88,7 @@ class FilterColor:
 	faire plusieurs enregistrements
 	'''
 	def calibrage(self): #TODO: permettre d'annuler avant de commencer le calibrage
+		objets = ["Balle", "Poteau"]
 		cameraCalibrage = 0
 		nbPrisesParCamera = 2
 		nbPrises = 1
@@ -104,7 +105,7 @@ class FilterColor:
 		        # Nao
 		
 		        #image = cam.getNewImage()
-			print "Capture de quelques images pour le calibrage : Cam ", cameraCalibrage, " prise ", nbPrises
+			print "Capture de quelques images pour le calibrage : Cam ", cameraCalibrage
 			images = cam.getMultipleImages(5,0.05)
 		
 			imageCourante = 0
@@ -124,9 +125,9 @@ class FilterColor:
 
 	                #print os.getcwd()
 			print "===== Calibrage ====="
-			while boucle:
-				nom = raw_input("Nom de l'objet : ")
-
+			for unobjet in objets:
+				nom = str(unobjet)+str(cameraCalibrage)
+				print "Calibrage de ", nom
 			#definition des fenêtres
 				cv2.namedWindow("Original",cv.CV_WINDOW_AUTOSIZE)
 				cv2.namedWindow("Configuration",cv.CV_WINDOW_AUTOSIZE)
@@ -211,8 +212,7 @@ class FilterColor:
 					if key == 113: #on quitte avec la touche q
 						break
 
-				print "Data : ", nom, ", ", h1, ", ", h2, ", ", s1, ", ", s2, ", ", v1, ", ", v2 
-				ligne = str(nom) + ", " + str(h1) + ", " + str(h2) + ", " + str(s1) + ", " + str(s2) + ", " + str(v1) + ", " + str(v2) + "\n" 
+				ligne = nom+ ", " + str(h1) + ", " + str(h2) + ", " + str(s1) + ", " + str(s2) + ", " + str(v1) + ", " + str(v2) + "\n" 
 
 				fichier.write(ligne)
 			
@@ -222,15 +222,9 @@ class FilterColor:
 				cv2.destroyWindow("Original")
 				cv2.waitKey(1)
 
-				rep = raw_input("Faire une autre saisie ? <n pour stopper>")
-				if rep == "n":
-					break;
-			if nbPrises < nbPrisesParCamera:
-				nbPrises += 1
-			else:
-				cameraCalibrage += 1
-				cam.switchCamera() #On passe a l'autre camera
-				nbPrises = 1
+				
+			cameraCalibrage += 1
+			cam.switchCamera() #On passe a l'autre camera
 		#On recharge finalement les nouvelles configurations d'objets
 		fichier.close()
 		self.loadConfig()
