@@ -28,7 +28,7 @@ class Decision:
         self.modePositionneBalle()
         self.modePrendreBalle()
         #self.modeRechercheBalle()
-		"""
+        """
 		#teste Alain
         cameraFinRecherche = self.modeRecherche()
         while self.marcheVersBalle(cameraFinRecherche) == False:
@@ -37,7 +37,7 @@ class Decision:
         
         print "On doit maintenant essayer de s'approcher de la balle"
         self.a.afficheImagesCourantes() #petit affichage pour voir
-		"""
+        """
 
     def routine (self):
         #phase de calibrage
@@ -391,4 +391,5 @@ class Decision:
         
         mo.debout()
         mh.reset() #Regard devant soi
+        
 

@@ -103,7 +103,7 @@ class Analyse:
 			raise NameError("pas de paramettres")
 			
 		if poteau and cercle is not None and thresh is not None:
-            raise NameError("paramètres poteau et cercle non compatible")
+			raise NameError("paramètres poteau et cercle non compatible")
 
 
 		#creation du thresh :
@@ -112,17 +112,16 @@ class Analyse:
 			imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)
 			####VOIR si ça marche #################################################
 			if poteau:
-		        thresh = self.filtre.filtrer(imageHSV, self.poteauName)
-		    else:
-		        if self.camera.getActiveCamera() == 0:
-		            threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamHaut)
-		            threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamHaut)
-		            
-		        else :
-		            threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamBas)
-		            threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamBas)
+				thresh = self.filtre.filtrer(imageHSV, self.poteauName)
+			else:
+				if self.camera.getActiveCamera() == 0:
+					threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamHaut)
+					threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamHaut)
+				else :
+					threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamBas)
+					threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamBas)
 
-        		thresh = cv2.bitwise_or(threshOmbre, threshLumiere)
+				thresh = cv2.bitwise_or(threshOmbre, threshLumiere)
 			######################################################################	
 			
 			self.imageFiltreCourante = thresh
@@ -316,14 +315,14 @@ class Analyse:
 		else :
 			return False
 
-        """
+		"""
 		#nouvelle version en cours de teste :
 		c = self.AnalyseMultiImage(zone=z,cercle=70,nb_img=5,nb_matching=3)
 		if c is not None:
 			return True
 		else :
 			return False
-        """
+		"""
 		
 		
     '''
@@ -409,7 +408,7 @@ class Analyse:
 	---------------------------
 	retourne la zone où la balle doit être prise en fonction de la résolution
     '''
-   	def getZoneTake(self):
+    def getZoneTake(self):
 		width = self.camera.getResolution()[0]
 		
 		#ceci est la zone idéale pour la résolution kVGA :
