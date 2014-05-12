@@ -7,9 +7,11 @@ import time
 
 
 while True:
-	#try :
-	print "start"
-	de = Decision()
+	try :
+		print "start"
+		de = Decision()
+	except KeyboardInterrupt:
+		pass
 	"""
 	except Exception as e:#en cas d'exception non prévu par les développeurs le code redémarre
 		print "error ",e
