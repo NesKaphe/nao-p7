@@ -31,12 +31,11 @@ class Analyse:
         self.pourcentage = 70
         
         #nom du filtre de la balle
-        self.BalleOmbreCamHaut = "BalleOmbre0"#balle filtrer name #TODO trouver un moyen de directement le recuperer dans le fichier
-        self.BalleLumiereCamHaut = "BalleLumiere0"
+        self.BalleCamHaut = "Balle0"#balle filtrer name #TODO trouver un moyen de directeme
 
-        self.BalleOmbreCamBas = "BalleOmbre1"
-        self.BalleLumiereCamBas = "BalleLumiere1" 
-        self.poteauName= "poteauBleu"
+        self.BalleCamBas = "Balle1"
+ 
+        self.poteauName= "poteau1"
         self.imageCourante = None
     
     def switchCamera(self):
@@ -111,21 +110,15 @@ class Analyse:
 		if thresh is None :
 			self.imageCourante = self.camera.getNewImage()
 			imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)
-			####VOIR si ça marche #################################################
+
 			if poteau:
 				thresh = self.filtre.filtrer(imageHSV, self.poteauName)
 			else:
 				if self.camera.getActiveCamera() == 0:
-					#threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamHaut)
-					threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamHaut)
+					thresh = self.filtre.filtrer(imageHSV, self.BalleCamHaut)
 				else :
-					#threshOmbre = self.filtre.filtrer(imageHSV, self.BalleOmbreCamBas)
-					threshLumiere = self.filtre.filtrer(imageHSV, self.BalleLumiereCamBas)
-
-				#thresh = cv2.bitwise_or(threshOmbre, threshLumiere)
-                                thresh = threshLumiere
-                                #TEST SANS LES THRESH OMBRE
-			######################################################################	
+					thresh = self.filtre.filtrer(imageHSV, self.BalleCamBas)
+	
 
 			self.imageFiltreCourante = thresh
                         
