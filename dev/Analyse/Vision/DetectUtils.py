@@ -81,6 +81,7 @@ class Zone():
 
 """
 createEmptyThresh (shape):
+-----------------------------------
 permet de creer une image thresh de la bonne dimension
 """
 def createEmptyThresh (shape):
@@ -89,6 +90,7 @@ def createEmptyThresh (shape):
 
 """
 vide(img_th):
+-----------------------------------
 renvoi si le threch est vide ou non (il y au moins un pixel blanc)
 """
 def vide(img_th):
@@ -97,6 +99,7 @@ def vide(img_th):
 
 """
 isInlist(l,element) :
+------------------------------------
 savoir si un element est dans la liste
 """
 def isInlist(l,element) :
@@ -109,6 +112,7 @@ def isInlist(l,element) :
 
 """
 union(img_th0,img_th1):
+-------------------------------------
 recupere 2 images thresh les compares en gardant tout les elements qui ont une intersection
 retourne une image thresh avec les résultats des comparaisons
 """
@@ -153,6 +157,7 @@ def union(img_th0,img_th1):
 	
 """
 unionV2(img_th0,img_th1):
+------------------------------
 version pour multiple_union() et autre du meme type
 retourne que les contours
 """
@@ -196,6 +201,7 @@ def unionV2(img_th0,img_th1):
 
 """
 multipleUnion (imgs):
+--------------------------------
 parametre :
 imgs = une liste d'images thresh
 calcul absolument toute les unions possibles
@@ -222,6 +228,7 @@ def multipleUnion (imgs):
 
 """
 multipleUnionSucc (imgs):
+----------------------------
 autre vesion qui transmet a son successeur l'image avec les unions
 avantage : cette version est linéaire alors 
 inconvénient : risque de perdre des donnees
@@ -268,27 +275,68 @@ def detectZone (thresh,zone):
 	
 	return False #on a rien trouvé dans la zone
 		
-#prend une img et dessine le cercle dedans
+
+'''
+dessineCercle (img, cercle):
+----------------------------------
+prend une image et dessine le cercle passé en paramètre dedans
+'''
 def dessineCercle(img,cercle):
 	cv2.circle(img,cercle.getCentre(),cercle.rayon,(0,255,255),2)
 
-#prend une img et dessine le rectangle dedans
+
+'''
+dessineRectangle (img, rectangle):
+-----------------------------------
+prend une image et dessine le rectangle passé en paramètre dedans
+'''
 def dessineRectangle(img,rectangle):
 	cv2.rectangle(img,rectangle.getCentre(),(rectangle.cote1, rectangle.cote2),(0,255,255),2)
 
-#prend une img et dessine la zone dedans
+
+'''
+dessineZone(img, z, color):
+-----------------------------------
+prend une image et dessine la zone passée en paramètre dedans
+'''
 def dessineZone(img,z,color=(0,256,0)):
 	cv2.rectangle(img,(z.x,z.y),(z.x+z.dx,z.y+z.dy),color,2)
 
 
-#pour calculer le taux de remplissage du cercle
+
+'''
+calculPourcentage(rayon, contour):
+-----------------------------------
+Permet de calculer le taux de remplissage du cercle par rapport à
+son cercle circonscrit
+'''
 def calculPourcentage(rayon, contour):
         aire_objet = cv2.contourArea(contour)
         aire_cercle = math.pi*rayon*rayon
         return (aire_objet/aire_cercle)*100
 
 
-#retourne les cercles et leurs pourcentage
+'''
+calculPourcentagePoteau(largeur, hauteur, contour):
+----------------------------------------------------
+Permet de calculer le taux de remplissage du poteau par rapport
+au rectangle qui l'englobe
+'''
+def calculPourcentagePoteau(largeur,hauteur, contour):
+        aire_objet = cv2.contourArea(contour)
+        aire_rectangle = largeur * hauteur
+        return (aire_objet / aire_rectangle)*100
+
+
+
+'''
+detectCercle(thresh, pourcentage):
+--------------------------------------
+Va chercher dans l'image binaire tous les objets ayant le 
+taux de remplissage de cercle demandé.
+Cette methode retourne les cercles trouvés ainsi que leur
+taux de remplissage
+'''
 def detectCercle(thresh, pourcentage):
 	contours = cv2.findContours(thresh.copy(),
 				    cv.CV_RETR_EXTERNAL,
@@ -309,7 +357,14 @@ def detectCercle(thresh, pourcentage):
 
 	return []
 
-#TODO : commenter
+
+'''
+detectCercleHough(thresh):
+------------------------------
+Va chercher dans l'image binaire tous les objets 
+ayant une forme circulaire.
+Cette methode utilise hough circles d'opencv
+'''
 def detecteCercleHough(thresh):
 	circles = cv2.HoughCircles(thresh.copy(),
 				   cv.CV_HOUGH_GRADIENT,2,15,param1=200,
@@ -322,8 +377,16 @@ def detecteCercleHough(thresh):
 		    liste.append(cercle)
         return liste
         
-#TODO : commenter
-def detectePoteau(thresh):
+
+'''
+detectePoteau(thresh, pourcentage):
+------------------------------------
+Va chercher dans l'image binaire tous les objets ayant le 
+taux de remplissage de rectangle demandé.
+Cette methode retourne les rectangles trouvés ainsi que leur
+taux de remplissage
+'''
+def detectePoteau(thresh, pourcentage):
 	contours = cv2.findContours(thresh.copy(),
 				    cv.CV_RETR_EXTERNAL,
 				    cv.CV_CHAIN_APPROX_NONE)[0]
@@ -331,34 +394,51 @@ def detectePoteau(thresh):
 		liste = []
 		for i in contours:
 			approx = cv2.approxPolyDP(i,0.02*cv2.arcLength(i,True),True)
-			if len(approx) == 4 and cv2.isContourConvex(approx) and cv2.contourArea(approx) > 0:
-				rect = cv2.minAreaRect(approx)
-				box = cv2.cv.BoxPoints(rect)
-				box = np.int0(box)
-				(x,y) = box[0]
-				(w, h) = box[1]
-				rectangle = Rectangle((int(x),int(y)),int(w),int(h))
-				liste.append(rectangle)
+			#if len(approx) == 4 and cv2.isContourConvex(approx) and cv2.contourArea(approx) > 0:
+                        rect = cv2.minAreaRect(approx)
+                        box = cv2.cv.BoxPoints(rect)
+                        box = np.int0(box)
+                        (x,y) = box[0]
+                        (w, h) = box[1]
+                        pourcent = calculPourcentagePoteau(w,h,approx)
+
+                        if pourcent > pourcentage: 
+                            rectangle = Rectangle((int(x),int(y)),int(w),int(h))
+                            liste.append((rectangle,pourcent))
 
 		return liste
 	return []
 
-#TODO : commenter
+
+'''
+distanceDuCentre(cercle, (centreX, centreY):
+--------------------------------------------
+Va retourner la distance d'un cercle par rapport au centre de l'image
+de la caméra. Cette methode prend en compte la direction des repères
+du nao
+'''
 def distanceDuCentre(cercle, (centreX, centreY)):
 	#Le repère du nao est inversé donc on multipliera par -1
 	vectX = (cercle.x - centreX) * -1
 	vectY = (cercle.y - centreY) * -1
 	return vectX, vectY
 
-#TODO : commenter
+
+'''
+pxToRad(distance, pxVision):
+------------------------------
+Va convertir une distance en px vers des degrés en radians
+'''
 def pxToRad(distance, pxVision):
-	angleVision = math.radians(60)
+	angleVision = math.radians(60) #Le nao à un angle de vision de 60 degrés
 	
 	pxToAngle = angleVision/pxVision
 
 	return distance * pxToAngle
 
 '''
+distance(c1,c2):
+--------------------------------
 calculer la distance entre 2 centre de cercle
 mettre en paramètre un couple de points
 '''

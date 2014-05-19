@@ -25,6 +25,7 @@ class Camera:
 			self.camera = 0 #Par defaut on prendra la camera du haut
 		else:
 			self.camera = camera
+		self.CAMERAEXPOSURE = 53
 		self.resolution = resolution
 		self.subscribe()
 
@@ -41,6 +42,8 @@ class Camera:
 					   self.camera, 
 					   self.resolution, 
 					   kBGRColorSpace, 30)
+
+		self.proxy.setParam(17,self.CAMERAEXPOSURE)
 
 
 	def unsubscribe(self):

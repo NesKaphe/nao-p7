@@ -28,11 +28,12 @@ class Decision:
 
         """
         #TEST CLEMENT
-        #self.modePositionneBalle()
-        #print "PASSE EN MODE PRENDRE BALLE"
-        #self.modePrendreBalle()
+        self.modePositionneBalle()
+        print "PASSE EN MODE PRENDRE BALLE"
+        self.modePrendreBalle()
         #self.modeRechercheBalle()
-
+        """
+        
         """
 		#teste Alain
         pourcentageRecherche = 70
@@ -44,8 +45,8 @@ class Decision:
         
         print "On doit maintenant essayer de s'approcher de la balle"
         self.a.afficheImagesCourantes() #petit affichage pour voir
-		
-		
+	"""	
+	#self.modePositionneBalle()	
         trouve = False
         marche = True
         position = False
@@ -55,10 +56,10 @@ class Decision:
 		#TODO : ici proposer le calibrage
         while fin is not True:
 			if trouve is False :
-				cameraFinRecherche = self.modeRecherche(pourcentage=pourcentageRecherche)
+				zoneMarche = self.modeRecherche(pourcentage=pourcentageRecherche)
 				trouve = True
 				
-			if self.marcheVersBalle(cameraFinRecherche) is False  and   marche is True:
+			if self.marcheVersBalle(zoneMarche) is False  and   marche is True:
 				print "On a perdu la balle... il faut rechercher a nouveau la balle"
 				trouve = False
 				break
@@ -111,6 +112,8 @@ class Decision:
     Ce mode va chercher a faire une approche grossière jusqu'a la balle
     '''
     def marcheVersBalle(self, zone_marche = None):
+        print "debut mode : marcheVersBalle"
+
         camera = self.a.camera.getActiveCamera() 
 
         resolution = self.a.camera.getResolution()
@@ -234,7 +237,8 @@ class Decision:
             print "DEBUG : l'angle de rotation est de ", angle
             #self.motion.setWalkTargetVelocity(0.5,0,angle,0.3)
             self.motion.moveTo(0.08,0,angle)
-   
+
+        print "fin mode : marcheVersBalle"       
 
 
     '''
@@ -244,6 +248,7 @@ class Decision:
 	et prendre la balle. Et ce relever.
     '''
     def modePrendreBalle(self):#premiere vesion pour prendre la balle
+ 		print "debut mode : modePrendreBalle" 
 		mo = Move(self.motion,self.posture)
 		self.a.setCameraBas()
 		
@@ -270,8 +275,8 @@ class Decision:
 		mo.relever()
 		mo.fermeMain()
 		#ici il faudrait faire une fonction check hand (verif main) 
+		print "fin mode : modePrendreBalle"
 		return True
-		
 
 
 
@@ -289,7 +294,7 @@ class Decision:
 	#si on trouve toujours pas prendre le rouge pour cible
 	#si il a plusieurs balles prendre celle qui est plus à gauche
         #une fois la balle trouvée, tourner le robot le plus possible vers la balle
-
+        
         if typeRecherche != "balle" and typeRecherche != "poteau":
             print "[modeRecherche] : Type de recherche inconnu : ", typeRecherche
             raise Exception
@@ -375,14 +380,15 @@ class Decision:
                             
         
         #ici on a trouvé la balle, il faudra surement enregistrer la zone ou autre
-        print "La balle est : ", balle
+        print "La balle choisie est : ", balle
         self.a.afficheImagesCourantes()
+        """
         while True:
             key = cv2.waitKey(33)
             key -= 0x100000
             if key == 113: #on quitte avec la touche q
                 break 
-
+        """
         #Calcul de l'angle pour centrer la balle
         angleBalleImage = self.a.getAngle(balle)
         #On ajoute l'angle de la tete a l'angle calculé pour savoir de combien le corps devra se tourner 
@@ -409,6 +415,7 @@ class Decision:
 	retourne vrai si la balle est à la bonne position
     """
     def modePositionneBalle(self):
+		print "debut mode : modePositionneBalle"
 		cameraNao = 0
 		a = Analyse(self.videoProxy,self.motion,self.posture,camera=cameraNao)
 		mo = Move(self.motion,self.posture)
@@ -456,6 +463,7 @@ class Decision:
 				if cpt_bp >= cpt_max :
 					return False
 		
+		print "fin mode : modePositionneBalle"
 		return True
 				
 

@@ -38,8 +38,12 @@ class FilterColor:
 
 		fichier.close()
 
-	#TODO : faire un commentaire
-	#retourne un image thresh a partir d'une image HSV
+
+	'''
+	filtrer :
+	Prend une image HSV et lui applique un filtre.
+	Retourne l'image binaire après le filtre
+	'''
 	def filtrer(self, imageHSV, nomObjet):
 		mini = None
 		maxi = None
@@ -49,7 +53,7 @@ class FilterColor:
 				maxi = np.array([objet[2],objet[4],objet[6]],np.uint8)
 				break
 
-		if mini != None:#TODO or maxi ?
+		if mini != None: #Si mini a été initialisé, maxi l'a aussi été
 			#Filtre de l'image en fonction de la couleur
 			imageHSV = cv2.medianBlur(imageHSV,15)
 			#imageHSV = cv2.blur(imageHSV,(10,10))
@@ -66,7 +70,20 @@ class FilterColor:
 		else:
 			raise Exception('Filtre impossible [nomObjet incorrect]')
 
-	''' Peut etre inutile
+	'''
+	renvoie un filtre sur la couleur rouge
+	'''
+	def filtrerCoucheRouge(self, image):
+		r = cv2.split(image)[2]
+		mini = np.array([100], np.uint8)
+		maxi = np.array([255], np.uint8)
+		t = cv2.inRange(r, mini, maxi)
+		return t
+
+	'''
+	multipleFilter:
+	Applique le filtre demandé sur une liste d'image en HSV
+	Retourne une liste d'image binaire filtrées 
 	'''
 	def multipleFilter(self, listeImagesHSV, nomObjet):
 		imgsFiltre = []
@@ -77,7 +94,7 @@ class FilterColor:
 	'''
 	multiHSVConvert :
 	prend une liste d'images et retourne 
-	une liste de c'elle si convertis en HSV
+	une liste de celles ci convertis en HSV
 	'''
 	def multiHSVConvert(self,listImgs):
 		imgsHSV = []
@@ -91,8 +108,7 @@ class FilterColor:
 	def calibrage(self): #TODO: permettre d'annuler avant de commencer le calibrage
 		objets = ["Balle", "Poteau"]
 		cameraCalibrage = 0
-		nbPrisesParCamera = 2
-		nbPrises = 1
+		tour = 0
 		#Ouverture du fichier 
 		fichier = open("./Data/colors.txt", "w+")
 		
@@ -107,7 +123,7 @@ class FilterColor:
 		
 		        #image = cam.getNewImage()
 			print "Capture de quelques images pour le calibrage : Cam ", cameraCalibrage
-			images = cam.getMultipleImages(5,0.05)
+			images = cam.getMultipleImages(10,0.05)
 		
 			imageCourante = 0
 		        # Webcam du pc pour les moments sans nao
@@ -167,7 +183,7 @@ class FilterColor:
 				#sur video
 				#imageHSV = cv2.cvtColor(images,cv2.COLOR_BGR2HSV)
 
-					if imageCourante >= 4:
+					if imageCourante >= 9:
 						imageCourante = 0
 					else:
 						imageCourante = imageCourante + 1
@@ -202,6 +218,10 @@ class FilterColor:
 					thresh = cv2.dilate(thresh,kernel,iterations=2)
 					thresh = cv2.erode(thresh,kernel,iterations=1)
 					'''
+
+					if unobjet == "Balle":
+						masqueRouge = self.filtrerCoucheRouge(images[imageCourante])
+						thresh = cv2.bitwise_and(thresh, masqueRouge)
 				#Puis on affiche à l'écran l'image
 				        cv2.imshow("Calibrage", thresh)
 
@@ -225,9 +245,8 @@ class FilterColor:
 
 				
 			cameraCalibrage += 1
-			cam.switchCamera() #On passe a l'autre camera
+			cam.switchCamera() #On passe a l'autre camera pour la calibrer
 		#On recharge finalement les nouvelles configurations d'objets
 		fichier.close()
 		self.loadConfig()
-		#cam.unsubscribe()
 	

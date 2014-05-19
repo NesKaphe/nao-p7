@@ -35,7 +35,10 @@ class Analyse:
 
         self.BalleCamBas = "Balle1"
  
-        self.poteauName= "poteau1"
+        self.poteauCamHaut= "poteau0"
+	
+	self.poteauCamBas = "poteau1"
+
         self.imageCourante = None
     
     def switchCamera(self):
@@ -71,7 +74,7 @@ class Analyse:
         cv2.waitKey(33)
 
 
-    #TODO : commentaire
+    #TODO : commentaire (Alain : voir même supprimer ca, c'est completement faux)
     def testZone(self, zone):
         return DU.detectZone(self.imageFiltreCourante, zone)
 
@@ -95,14 +98,13 @@ class Analyse:
 	cerlce + zone : renvois les cercles dans la zone (avec leurs pourcentages de remplissage respectif)
 					Un cercle est considéré dans la zone si son centre est dans la zone.
     '''
-	#TODO : implémenter le paramètre dessin
 
-    def AnalyseImg(self,thresh=None,zone=None,cercle=None,poteau=False,dessin=True) :#va contenir la nouvelle version
+    def AnalyseImg(self,thresh=None,zone=None,cercle=None,poteau=None,dessin=True) :#va contenir la nouvelle version
     
 		if zone is None and cercle is None and poteau is not True :
 			raise NameError("pas de paramettres")
 			
-		if poteau and cercle is not None and thresh is not None:
+		if poteau is not None and cercle is not None and thresh is not None:
 			raise NameError("paramètres poteau et cercle non compatible")
 
 
@@ -114,11 +116,16 @@ class Analyse:
 			if poteau:
 				thresh = self.filtre.filtrer(imageHSV, self.poteauName)
 			else:
+                                masqueRouge = self.filtre.filtrerCoucheRouge(self.imageCourante)
+                                #On applique le masque a l'image hsv
 				if self.camera.getActiveCamera() == 0:
-					thresh = self.filtre.filtrer(imageHSV, self.BalleCamHaut)
+					thresh_tmp = self.filtre.filtrer(imageHSV, self.BalleCamHaut)
 				else :
-					thresh = self.filtre.filtrer(imageHSV, self.BalleCamBas)
-	
+					thresh_tmp = self.filtre.filtrer(imageHSV, self.BalleCamBas)
+                                print "type thresh_tmp ", thresh_tmp.size
+                                print "type masque_rouge", masqueRouge.size
+                                thresh = cv2.bitwise_and(thresh_tmp,masqueRouge)
+                                print "type thresh : ", type(thresh)
 
 			self.imageFiltreCourante = thresh
                         
@@ -176,7 +183,7 @@ class Analyse:
 	est longue
     '''
 	
-    def AnalyseMultiImage(self,thresh=None,zone=None,cercle=None,poteau=False, dessin=True,nb_img=5,nb_matching=2):
+    def AnalyseMultiImage(self,thresh=None,zone=None,cercle=None,poteau=None, dessin=True,nb_img=5,nb_matching=2):
 	
 		if nb_matching > nb_img :
 			raise NameError ("nb_matching > nb_img")
