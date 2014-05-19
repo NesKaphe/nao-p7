@@ -26,14 +26,21 @@ class Decision:
         self.initialisation()
         #self.a.filtre.calibrage()
 
-        """
+
         #TEST CLEMENT
+<<<<<<< HEAD
         self.modePositionneBalle()
         print "PASSE EN MODE PRENDRE BALLE"
         self.modePrendreBalle()
         #self.modeRechercheBalle()
         """
         
+=======
+        #self.modePositionneBalle()
+        #print "PASSE EN MODE PRENDRE BALLE"
+        self.modePrendreBalle()
+        #self.modeRechercheBalle()
+>>>>>>> 68c94917eb7146c8f44dad71f427b9bea8c0feb9
         """
 		#teste Alain
         pourcentageRecherche = 70
@@ -79,7 +86,7 @@ class Decision:
 			if position is True :
 				if self.modePrendreBalle() is False :
 					position = False
-			
+        """
     def routine (self):
         #phase de calibrage
         a = Analyse(self.videoProxy)
@@ -256,8 +263,8 @@ class Decision:
 		
 		while not self.a.takeOk() :
 			print "je ne peux pas prendre la balle"
-			#self.a.afficheImagesCourantes()
-			#cv2.waitKey(0)
+			self.a.afficheImagesCourantes()
+			cv2.waitKey(0)
 			cpt+=1
 			if cpt > 30 :
 				return False
