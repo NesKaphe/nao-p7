@@ -68,7 +68,7 @@ class FilterColor:
 			thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
 			return thresh
 		else:
-			raise Exception('Filtre impossible [nomObjet incorrect]')
+			raise Exception('Filtre impossible [nomObjet incorrect]'+str(nomObjet))
 
 	'''
 	renvoie un filtre sur la couleur rouge
@@ -219,9 +219,7 @@ class FilterColor:
 					thresh = cv2.erode(thresh,kernel,iterations=1)
 					'''
 
-					if unobjet == "Balle":
-						masqueRouge = self.filtrerCoucheRouge(images[imageCourante])
-						thresh = cv2.bitwise_and(thresh, masqueRouge)
+					
 				#Puis on affiche à l'écran l'image
 				        cv2.imshow("Calibrage", thresh)
 

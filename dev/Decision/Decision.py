@@ -28,20 +28,11 @@ class Decision:
 
 
         #TEST CLEMENT
-<<<<<<< HEAD
         self.modePositionneBalle()
         print "PASSE EN MODE PRENDRE BALLE"
         self.modePrendreBalle()
         #self.modeRechercheBalle()
-        """
-        
-=======
-        #self.modePositionneBalle()
-        #print "PASSE EN MODE PRENDRE BALLE"
-        self.modePrendreBalle()
-        #self.modeRechercheBalle()
->>>>>>> 68c94917eb7146c8f44dad71f427b9bea8c0feb9
-        """
+
 		#teste Alain
         pourcentageRecherche = 70
         cameraFinRecherche = self.modeRecherche(pourcentage=pourcentageRecherche)
@@ -52,7 +43,7 @@ class Decision:
         
         print "On doit maintenant essayer de s'approcher de la balle"
         self.a.afficheImagesCourantes() #petit affichage pour voir
-	"""	
+	
 	#self.modePositionneBalle()	
         trouve = False
         marche = True
@@ -86,7 +77,7 @@ class Decision:
 			if position is True :
 				if self.modePrendreBalle() is False :
 					position = False
-        """
+
     def routine (self):
         #phase de calibrage
         a = Analyse(self.videoProxy)

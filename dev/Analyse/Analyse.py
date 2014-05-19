@@ -31,7 +31,7 @@ class Analyse:
         self.pourcentage = 70
         
         #nom du filtre de la balle
-        self.BalleCamHaut = "Balle0"#balle filtrer name #TODO trouver un moyen de directeme
+        self.BalleCamHaut = "Balle0" #balle filtrer name #TODO trouver un moyen de directeme
 
         self.BalleCamBas = "Balle1"
  
@@ -113,19 +113,16 @@ class Analyse:
 			self.imageCourante = self.camera.getNewImage()
 			imageHSV = cv2.cvtColor(self.imageCourante, cv2.COLOR_BGR2HSV)
 
-			if poteau:
+			if poteau is not None:
 				thresh = self.filtre.filtrer(imageHSV, self.poteauName)
 			else:
-                                masqueRouge = self.filtre.filtrerCoucheRouge(self.imageCourante)
+                                #masqueRouge = self.filtre.filtrerCoucheRouge(self.imageCourante)
+				thresh = None
                                 #On applique le masque a l'image hsv
 				if self.camera.getActiveCamera() == 0:
-					thresh_tmp = self.filtre.filtrer(imageHSV, self.BalleCamHaut)
+					thresh = self.filtre.filtrer(imageHSV, self.BalleCamHaut)
 				else :
-					thresh_tmp = self.filtre.filtrer(imageHSV, self.BalleCamBas)
-                                print "type thresh_tmp ", thresh_tmp.size
-                                print "type masque_rouge", masqueRouge.size
-                                thresh = cv2.bitwise_and(thresh_tmp,masqueRouge)
-                                print "type thresh : ", type(thresh)
+					thresh = self.filtre.filtrer(imageHSV, self.BalleCamBas)
 
 			self.imageFiltreCourante = thresh
                         
@@ -133,7 +130,7 @@ class Analyse:
 		
 		cerclesP = []#liste de cercles plus pourcentages
 		zones = []#va contenir la liste des objets dans la zone
-		
+
 		#dessiner la zone (pour le developpeur):
 		if zone is not None :
 			DU.dessineZone(self.imageCourante,zone)
