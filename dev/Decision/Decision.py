@@ -23,12 +23,26 @@ class Decision:
         self.videoProxy = ALProxy("ALVideoDevice", self.IP, self.PORT)
         self.a = Analyse(self.videoProxy, self.motion, self.posture, camera=0)
         
-        self.initialisation()
+        
+    '''
+    run (self, demo=0):
+    ----------------------------
+    liste des demonstrations : 
+	0 : lancement complet du programme
+	1 : recherche uniquement
+	2 : recherche et marche
+	3 : approche de balle
+	4 : ramasser la balle
+	5 : approche et ramasser la balle
+    '''
+    def run (self, demo=0, verbose = True):
+	""" #TODO: a virer
+	#self.initialisation()
         #self.a.filtre.calibrage()
 
 
         #TEST CLEMENT
-        self.modePositionneBalle()
+        #self.modePositionneBalle()
         print "PASSE EN MODE PRENDRE BALLE"
         self.modePrendreBalle()
         #self.modeRechercheBalle()
@@ -44,27 +58,97 @@ class Decision:
         print "On doit maintenant essayer de s'approcher de la balle"
         self.a.afficheImagesCourantes() #petit affichage pour voir
 	
-	#self.modePositionneBalle()	
+	#self.modePositionneBalle()
+	"""
+	texte = "Lancement de : "
+
+	if demo == 1: #recherche uniquement
+	    doRecherche = True
+	    doMarche = False
+	    doPosition = False
+	    doRamasse = False
+	    doLancer = False
+	    texte = texte+" Recherche"
+
+	elif demo == 2: #recherche et marche
+	    doRecherche = True
+	    doMarche = True
+	    doPosition = False
+	    doRamasse = False
+	    doLancer = False
+	    texte = texte+" Recherche et marche"
+
+	elif demo == 3: #approche de balle
+	    doRecherche = False
+	    doMarche = False
+	    doPosition = True
+	    doRamasse = False
+	    doLancer = False
+	    texte = texte+" Approche de balle"
+	
+	elif demo == 4: #ramasser la balle
+	    doRecherche = False
+	    doMarche = False
+	    doPosition = False
+	    doRamasse = True
+	    doLancer = False
+	    texte = texte+" Ramasser la balle"
+
+	elif demo == 5: #approcher et ramasser la balle
+	    doRecherche = False
+	    doMarche = False
+	    doPosition = True
+	    doRamasse = True
+	    doLancer = False
+	    texte = texte+" Approcher et ramasser la balle"
+
+	elif demo == 6:
+	    doRecherche = False
+	    doMarche = False
+	    doPosition = False
+	    doRamasse = True
+	    doLancer = True
+	    texte = texte+" Ramasser et lancer la balle"
+
+	else: #Par defaut on lance le programme completment
+	    doRecherche = True
+	    doMarche = True
+	    doPosition = True
+	    doRamasse = True
+	    doLancer = True
+	    texte = texte+" Programme complet"
+
+	print texte
+
         trouve = False
         marche = True
         position = False
+	ramasse = False
         fin = False
-        pourcentageRecherche = 70
+        
+
+	pourcentageRecherche = 70
 		
-		#TODO : ici proposer le calibrage
         while fin is not True:
+		if doRecherche is True:
 			if trouve is False :
 				zoneMarche = self.modeRecherche(pourcentage=pourcentageRecherche)
 				trouve = True
-				
+		else:
+			trouve = True
+			zoneMarche = None
+
+		if doMarche is True:
 			if self.marcheVersBalle(zoneMarche) is False  and   marche is True:
 				print "On a perdu la balle... il faut rechercher a nouveau la balle"
 				trouve = False
-				break
+				continue
 			else :
 				marche = False
-			
-			
+		else:
+			marche = False
+
+		if doPosition is True:
 			if self.modePositionneBalle() is False :
 				print "modePositionneBalle : balle perdu"
 				trouve = False
@@ -73,10 +157,30 @@ class Decision:
 			else :
 				print "modePositionneBalle : "
 				position = True
-			
+		else:
+			position = True
+
+		if doRamasse is True:
 			if position is True :
 				if self.modePrendreBalle() is False :
 					position = False
+					ramasse = False
+				else:
+					ramasse = True
+
+		else:
+			ramasse = True
+
+
+		if doLancer is True:
+			if ramasse is True:
+				self.modeLancer()
+
+		#On va regarder si on a remplis toutes les conditions
+		if trouve is True and marche is False and position is True and ramasse is True:
+			fin = True
+	
+	print "Execution terminée"
 
     def routine (self):
         #phase de calibrage
@@ -248,10 +352,10 @@ class Decision:
     def modePrendreBalle(self):#premiere vesion pour prendre la balle
  		print "debut mode : modePrendreBalle" 
 		mo = Move(self.motion,self.posture)
+		mo.deboutPrendre()
 		self.a.setCameraBas()
-		
+	
 		cpt = 0
-		
 		while not self.a.takeOk() :
 			print "je ne peux pas prendre la balle"
 			self.a.afficheImagesCourantes()
@@ -271,7 +375,7 @@ class Decision:
 		"""
 		#ici faire aussi un check sur les capteurs
 		mo.relever()
-		mo.fermeMain()
+		#mo.fermeMain()
 		#ici il faudrait faire une fonction check hand (verif main) 
 		print "fin mode : modePrendreBalle"
 		return True
@@ -380,13 +484,13 @@ class Decision:
         #ici on a trouvé la balle, il faudra surement enregistrer la zone ou autre
         print "La balle choisie est : ", balle
         self.a.afficheImagesCourantes()
-        """
+        '''
         while True:
             key = cv2.waitKey(33)
             key -= 0x100000
             if key == 113: #on quitte avec la touche q
                 break 
-        """
+        '''
         #Calcul de l'angle pour centrer la balle
         angleBalleImage = self.a.getAngle(balle)
         #On ajoute l'angle de la tete a l'angle calculé pour savoir de combien le corps devra se tourner 
@@ -464,6 +568,11 @@ class Decision:
 		print "fin mode : modePositionneBalle"
 		return True
 				
+
+    def modeLancer(self):
+	mo = Move(self.motion,self.posture)
+	#mo.deboutMarche()
+	mo.lancer()
 
 
     def initialisation(self):

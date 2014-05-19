@@ -25,7 +25,7 @@ class Camera:
 			self.camera = 0 #Par defaut on prendra la camera du haut
 		else:
 			self.camera = camera
-		self.CAMERAEXPOSURE = 53
+		self.CAMERAEXPOSURE = 150
 		self.resolution = resolution
 		self.subscribe()
 

@@ -31,7 +31,7 @@ class Analyse:
         self.pourcentage = 70
         
         #nom du filtre de la balle
-        self.BalleCamHaut = "Balle0" #balle filtrer name #TODO trouver un moyen de directeme
+        self.BalleCamHaut = "Balle0"
 
         self.BalleCamBas = "Balle1"
  
@@ -308,7 +308,7 @@ class Analyse:
 		z = self.getZoneTake()
 		print "la zone:",z#INFO developpeur
 
-		#ancienne version 
+		#ancienne version
 		c = self.AnalyseImg(zone=z,cercle=70)#TODO ici faire une analyse fine !!
 		if len(c) > 0 :
 			return True
@@ -416,8 +416,8 @@ class Analyse:
 		width = self.camera.getResolution()[0]
 		
 		#ceci est la zone idéale pour la résolution kVGA :
-		x=87
-		y=295
+		x=98
+		y=250
 		dx = 30
 		dy = 30
 		

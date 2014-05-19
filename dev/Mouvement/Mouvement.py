@@ -14,6 +14,8 @@ import almath
 import math#contien pi
 import a_croupis
 import relever
+import lancer
+import debout_prendre
 
 
 class Head:
@@ -128,6 +130,9 @@ class Move :
 
 	def deboutMarche(self):
 		self.posture.goToPosture("StandInit", 0.5)
+
+	def deboutPrendre(self):
+		debout_prendre.move(self.motion)
 		
 	def marche(self):
 		self.debout()
@@ -138,6 +143,9 @@ class Move :
 	
 	def relever(self):
 		relever.move(self.motion)
+
+	def lancer(self):
+		lancer.move(self.motion)
 	
 	def ouvreMain(self):#ouvrir la main gauche
 		self.motion.openHand("LHand")
