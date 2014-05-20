@@ -363,7 +363,6 @@ def union3(img_th0,img_th1):#version pour multicontours ne retourne que les cont
 			l_des1.append(des1)
 
 	#recherche d'intersections :
-	p
 	for i,(des0,c0) in enumerate(zip(l_des0,conts0)) :
 			for j,(des1,c1) in enumerate(zip(l_des1,conts1)) :
 				inter = cv2.bitwise_and(des0,des1)#on dessine l'intersection
@@ -615,21 +614,23 @@ def main() :
 	cv2.imshow("fusion !!! ", u)
 	"""
 	#teste d'unions multiples :
-	"""
+	
 	print "image 0?"
 	cv2.waitKey(0)#attendre l'utilisateur
 	img0 = get_one_img(0)
 	print "image 1?"
 	cv2.waitKey(0)#attendre l'utilisateur
 	img1 = get_one_img(1)
+	"""
 	print "image 2?"
 	cv2.waitKey(0)#attendre l'utilisateur
 	img2 = get_one_img(2)
 	print "image 3?"
 	cv2.waitKey(0)#attendre l'utilisateur
 	img3 = get_one_img(3)
+	"""
 	
-	imgs = [img0,img1,img2,img3]
+	imgs = [img0,img1]#,img2,img3]
 	tps1 = time.clock()#calcul du temps
 	mu = multiple_union(imgs)#LE Coeur du code
 	tps2 = time.clock()#calcul du temps
@@ -637,10 +638,10 @@ def main() :
 		
 	cv2.imshow("img0 ", img0[0])
 	cv2.imshow("img1 ", img1[0])
-	cv2.imshow("img2 ", img2[0])
-	cv2.imshow("img3 ", img3[0])
+	#cv2.imshow("img2 ", img2[0])
+	#cv2.imshow("img3 ", img3[0])
 	cv2.imshow("multi fusion !!! ", mu)
-	"""
+	
 	"""
 	##############################################################
 	#ICI C'est le banc de teste :
@@ -670,7 +671,7 @@ def main() :
 	cv2.imshow("img3 ", img3[0])
 	cv2.imshow("multi fusion !!! ", mu)
 	"""
-	
+	"""
 	print "image 0?"
 	cv2.waitKey(0)#attendre l'utilisateur
 	img0 = get_one_img(0)
@@ -693,10 +694,10 @@ def main() :
 		
 		cv2.rectangle(img0[0],(z.x,z.y),(z.y+z.dy,z.x+z.dx),(128,128,128),5)#pour dessiner la zone
 		cv2.imshow("img0 ", img0[0])
-	
+	"""
 	#############################################################
-	
-	cv2.waitKey(0)#fermer si il a y une touche appuye
+	while True :
+		cv2.waitKey(0)#fermer si il a y une touche appuye
 	cv2.destroyAllWindows()
 
 	
