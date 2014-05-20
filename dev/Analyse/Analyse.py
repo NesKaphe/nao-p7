@@ -30,7 +30,7 @@ class Analyse:
         #Pourcentage de ressemblance avec un cercle (detection de la balle)
         self.pourcentage = 70
         
-        #nom du filtre de la balle
+        #nom des filtres
         self.BalleCamHaut = "Balle0"
 
         self.BalleCamBas = "Balle1"
@@ -41,6 +41,11 @@ class Analyse:
 
         self.imageCourante = None
     
+    '''
+    Methodes raccourcis pour changer de camera.
+    Ces methodes vont déléguer le changement de camera
+    à l'objet Camera
+    '''
     def switchCamera(self):
         self.camera.switchCamera()
 
@@ -74,10 +79,6 @@ class Analyse:
         cv2.waitKey(33)
 
 
-    #TODO : commentaire (Alain : voir même supprimer ca, c'est completement faux)
-    def testZone(self, zone):
-        return DU.detectZone(self.imageFiltreCourante, zone)
-
     '''
 	AnalyseImg :
 	--------------------------------------------
@@ -99,7 +100,7 @@ class Analyse:
 					Un cercle est considéré dans la zone si son centre est dans la zone.
     '''
 
-    def AnalyseImg(self,thresh=None,zone=None,cercle=None,poteau=None,dessin=True) :#va contenir la nouvelle version
+    def AnalyseImg(self,thresh=None,zone=None,cercle=None,poteau=None,dessin=True) :
     
 		if zone is None and cercle is None and poteau is not True :
 			raise NameError("pas de paramettres")
@@ -271,23 +272,25 @@ class Analyse:
 		return DU.Cercle((posx,posy),r)
 		
 	
-	#TODO : commenter !!!!!!
-	#COMMENT : problème cette distance au centre ne ce fait que avec des cercles 
-	#il faudrait que ce soit possible de passer des coordonées et/ou des cercles
-	# exemple :
-	#getAngle(cercle) possible
-	#getAngle((100,150)) possible
-	#prend en paramètre un cercle et calcul angle qui permet de centrer 
-	#le cercle dans l'iage
+    '''
+    getAngle(self, cercle):
+    -----------------------------------------------------------
+    Va calculer l'angle entre le centre de l'image et le cercle
+    '''
     def getAngle(self, cercle):
         centre = self.getCentreImage()
-        pxVision = self.camera.getResolution() #self.getPxVision()
-        vectX, vectY = DU.distanceDuCentre(cercle,centre)#mm commentaire
+        pxVision = self.camera.getResolution()
+        vectX, vectY = DU.distanceDuCentre(cercle,centre)
         angleX = DU.pxToRad(vectX, pxVision[0])
         return angleX
 
 
-    #TODO : commenter
+    '''
+    meilleureBalle(self, listeBalles):
+    -----------------------------------------------------------
+    Va parcourir une liste de balles et retourner celle qui a le
+    taux de remplissage le plus haut
+    '''
     def meilleureBalle(self, listeBalles):
         meilleurCercle, meilleurPourcent = None, 0
         for (cercle,pourcent) in listeBalles:

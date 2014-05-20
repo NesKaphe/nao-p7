@@ -18,36 +18,74 @@ import lancer
 import debout_prendre
 
 
+"""
+class Head
+-------------------------------------------
+Contient les methodes utilisées pour les mouvements
+de tête du Nao
+"""
 class Head:
 	def __init__(self,motion,posture):
 		self.motion = motion
 		self.posture = posture
-		#correspond au temps/vitesse pour atteindre l'angle voulut
+
+		#correspond au temps/vitesse pour atteindre l'angle voulu
 		self.incrSpeeds = 0.05
-		self.step = 0.02 #correspond au "pas" précis #TODO n'est pas utilisé
 	
-	def getYawAngle (self):#retourne l'angle Yaw en radian
+	"""
+	getYawAngle (self):
+	--------------------------------------------
+	retourne l'angle Yaw de la tête en radians
+	"""
+	def getYawAngle (self):
 		return self.motion.getAngles("HeadYaw",True)[0]
 
-	def getPitchAngle (self):#retourne l'angle Pitch en radian
+	"""
+	getPitchAngle (self):
+	--------------------------------------------
+	retourne l'angle Pitch de la tête en radians
+	"""
+	def getPitchAngle (self):
 		return self.motion.getAngles("HeadPitch",True)[0]
 
 
-	def turnTo(self,angleYaw,anglePitch,speedX=1.5,speedY=1.5) :#va donner les angles directement a la tête (angle en radian)
+	"""
+	turnTo(self,angleYaw,anglePitch,speedX=1.5,speedY=1.5):
+	--------------------------------------------------------
+	Va donner directement les angles à la tête.
+	Les angles doivent être en radians.
+	Un angle positif fera tourner la tête vers la gauche.
+	Un angle négatif fera tourner la tête vers la droite.	
+	Il est possible de controler les différentes vitesse de
+	rotation des moteurs.
+	"""
+	def turnTo(self,angleYaw,anglePitch,speedX=1.5,speedY=1.5) :
 		print "debug - angle = ",angleYaw,"  ",anglePitch
 		self.motion.setStiffnesses("Head", 1.0)
 		names  = ["HeadYaw", "HeadPitch"]
 		angles = [angleYaw, anglePitch]
 		times  = [speedX, speedY]
-		isAbsolute = True#?
+		isAbsolute = True
 		self.motion.angleInterpolation(names, angles, times, isAbsolute)
-		#ici voir si il y a besion de relacher le stiffnesse
-		print "mouvement tete - fini"		
+		#print "mouvement tete - fini" #message de debug pour les developpeurs	
 	
+	"""
+	tension (self, t):
+	------------------------------------------------
+	Permet de choisir l'état de rigidité des moteurs de la tête
+	"""
 	def tension (self,t):
 		self.motion.setStiffnesses("Head", t)	
 
-	def incrAnglesTo(self,angleYaw,anglePitch,speedX=1.5,speedY=1.5) :#va incrementer les angles de la tete avec ceux en parametres
+	"""
+	incrAnglesTo(self,angleYaw,anglePitch,speedX=1.5,speedY=1.5):
+	-------------------------------------------------------------
+	Va incrementer les angles de la tete avec ceux en parametres.
+	Les angles doivent être en radians
+	Il est possible de contrôler les différentes vitesse 
+	de rotation des moteurs
+	"""
+	def incrAnglesTo(self,angleYaw,anglePitch,speedX=1.5,speedY=1.5) :#
 		self.motion.setStiffnesses("Head", 1.0)
 		angleYaw += self.getYawAngle()
 		anglePitch += self.getPitchAngle()
@@ -56,66 +94,32 @@ class Head:
 		times  = [speedX, speedY]
 		isAbsolute = True#?
 		self.motion.angleInterpolation(names, angles, times, isAbsolute)
-		#ici voir si il y a besion de relacher le stiffnesse
-		print "mouvement tete - fini"
+		#print "mouvement tete - fini" #Message de debug pour les developpeurs
+	
 
-
-		
-	def incrAngles(self,dirX,dirY) :#incrémenter l'angle d'un "pas"(step)
-		self.motion.setStiffnesses("Head", 1.0) 
-		names  = ["HeadYaw", "HeadPitch"]
-		angleYaw =  self.getYawAngle() + self.angleYaw+(dirX*self.step)
-		anglePitch = self.getPitchAngle() + self.anglePitch+(dirY*self.step)
-		angles = [angleYaw,anglePitch]
-		times  = [self.incrSpeeds, self.incrSpeeds]
-		isAbsolute = True#?
-		self.motion.angleInterpolation(names, angles, times, isAbsolute)	
-
-		
+	"""
+	reset(self) :
+	--------------------------------------------
+	Remet les angles Yaw et Pitch à 0
+	Nao regardera devant lui après un appel à
+	cette methode
+	"""
 	def reset(self) :#met la tete à l'angle 0,0
 		self.motion.setStiffnesses("Head", 1.0) 
 		names  = ["HeadYaw", "HeadPitch"]
 		angles = [0.0, 0.0]
 		times  = [1.5, 1.5]
-		isAbsolute = True#??
+		isAbsolute = True
 		self.motion.angleInterpolation(names, angles, times, isAbsolute)
 		print "reset"
 
 
-	def test (self):#petit teste pour faire des mouvements de tete
-		i=2
-		while (i!=0) :
-			self.turnTo(50.0,50.0)
-			self.turnTo(50.0,-50.0)
-			self.turnTo(-50.0,-50.0)
-			self.turnTo(-50.0,50.0)
-			i-=1
-		self.reset()
-	
-	def test2 (self) :#petit teste pour faire des mouvements de tete
-		#self.posture.goToPosture("StandInit",0.5)
-		i=100
-		while (i!=0) :
-			self.incrAngles(dirX=-1,dirY=0)
-			print i
-			i-=1
-		i=100
-		while (i!=0) :
-			self.incrAngles(dirX=1,dirY=0)
-			print i
-			i-=1
 
 """
-#petit test
-h = Head()	
-h.test2()
-h.reset()
-h.motion.setStiffnesses("Head", 0.0)
-print "fin"
-"""
-
-"""
-contient tout ce qui concerne la marche
+class Move
+------------------------------------------------
+Contient les methodes utilisées pour les mouvements de
+deplacements du Nao.
 """
 
 class Move :
@@ -124,49 +128,111 @@ class Move :
 		self.posture = posture
 		self.pas = 0.02#un pas représente 1 cm
 	
+	"""
+	debout(self):
+	-----------------------------------------
+	Va mettre Nao en position debout avec le corps
+	droit	
+	"""
 	def debout(self):
-		self.posture.goToPosture("Stand", 0.5)
-		#self.motion.moveInit()	
+		self.posture.goToPosture("Stand", 0.5)	
 
+	"""
+	deboutMarche(self):
+	-----------------------------------------
+	Va mettre Nao en position debout comme durant
+	la marche
+	"""
 	def deboutMarche(self):
 		self.posture.goToPosture("StandInit", 0.5)
 
+	"""
+	deboutPrendre(self):
+	------------------------------------------
+	Va faire appel à un mouvement pré-enregistré
+	grâce à choregraphe pour placer le robot en
+	position debout pret à ramasser la balle
+	"""
 	def deboutPrendre(self):
 		debout_prendre.move(self.motion)
-		
-	def marche(self):
-		self.debout()
-		pass
-		
+	
+	"""
+	aCroupris(self):
+	--------------------------------------------
+	Va faire appel à un mouvement pré-enregistré
+	grâce à choregraphe pour ramasser la balle
+	"""	
 	def aCroupris(self):
 		a_croupis.move(self.motion)
 	
+
+	"""
+	relever(self):
+	--------------------------------------------
+	Va faire appel à un mouvement pré-enregistré
+	grâce à choregraphe pour relever le robot
+	après la prise de balle
+	"""
 	def relever(self):
 		relever.move(self.motion)
 
+	"""
+	lancer(self):
+	--------------------------------------------
+	Va faire appel à un mouvement pré-enregistré
+	grâce à choregraphe pour lancer la balle
+	en avant
+	"""
 	def lancer(self):
 		lancer.move(self.motion)
 	
-	def ouvreMain(self):#ouvrir la main gauche
+	
+	"""
+	ouvreMain(self):
+	--------------------------------------------
+	Va ouvrir la main gauche de Nao
+	"""
+	def ouvreMain(self):
 		self.motion.openHand("LHand")
 	
-	def fermeMain(self):#fermer la main gauche
+
+	"""
+	fermerMain(self):
+	-------------------------------------------
+	Va fermer la main gauche de Nao
+	"""
+	def fermeMain(self):
 		self.motion.closeHand("LHand")
 	
-	def seRetourner(self):
-		self.motion.moveTo(0,0,math.pi)
 	
+	"""
+	turnTo(self,angle):
+	------------------------------------------
+	Va tourner le corps de Nao de l'angle passé
+	en paramètre.
+	L'angle doit être en radians
+	"""
 	def turnTo(self,angle):
 		self.motion.moveTo(0,0,angle)
-		
+	
+
+	"""
+	Methodes de pas:
+	-------------------------------------------
+	Ces methodes vont permettre à Nao d'effectuer
+	un unique pas.
+	"""	
 	def pasEnAvant(self):
 		self.motion.moveTo(self.pas,0,0)
 	
+
 	def pasEnArriere(self):
 		self.motion.moveTo(-self.pas,0,0)
-		
+	
+	
 	def pasAGauche(self):
 		self.motion.moveTo(0,self.pas,0)
-		
+	
+	
 	def pasADroite(self):
 		self.motion.moveTo(0,-self.pas,0)

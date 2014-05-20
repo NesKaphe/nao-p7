@@ -17,20 +17,16 @@ class FilterColor:
 		
 
 	def loadConfig(self):
-		#Peut etre changer ca en mettant le path dans un fichier de config
-		print os.getcwd()
 		fichier = open("./Data/colors.txt", "r")
 		
 		'''
-		Je met ici mais on trouvera un autre endroit pour l'expliquer:
-		le fichier colors.txt devra contenir sur une ligne H min, 
-		S min, V min, H max, S max, V max 
+		le fichier colors.txt devra contenir sur une ligne:
+		nomObjet, H min, S min, V min, H max, S max, V max 
 		pour les couleurs de cet objet
 		'''
 
 		#lecture du fichier
 		for ligne in fichier:
-			print ligne
 			#On retire le \n de fin de ligne
 			ligne = ligne.rstrip('\n')
 			params = ligne.split(', ')
@@ -56,15 +52,11 @@ class FilterColor:
 		if mini != None: #Si mini a été initialisé, maxi l'a aussi été
 			#Filtre de l'image en fonction de la couleur
 			imageHSV = cv2.medianBlur(imageHSV,15)
-			#imageHSV = cv2.blur(imageHSV,(10,10))
 			thresh = cv2.inRange(imageHSV,mini,maxi) 
 
 			#On va maintenant corriger quelques imperfection de l'image filtree
 			thresh = cv2.medianBlur(thresh,15)
-			#thresh = cv2.blur(thresh,(10,10))
 			kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(10,10))
-			#thresh = cv2.dilate(thresh,kernel,iterations=4)
-			#thresh = cv2.erode(thresh,kernel,iterations=4)
 			thresh = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
 			return thresh
 		else:
@@ -105,7 +97,7 @@ class FilterColor:
 	''' va afficher la fenetre pour calibrer les couleurs + interaction avec la console pour
 	faire plusieurs enregistrements
 	'''
-	def calibrage(self): #TODO: permettre d'annuler avant de commencer le calibrage
+	def calibrage(self):
 		objets = ["Balle", "Poteau"]
 		cameraCalibrage = 0
 		tour = 0
@@ -121,11 +113,11 @@ class FilterColor:
 		
 		        # Nao
 		
-		        #image = cam.getNewImage()
 			print "Capture de quelques images pour le calibrage : Cam ", cameraCalibrage
 			images = cam.getMultipleImages(10,0.05)
 		
 			imageCourante = 0
+
 		        # Webcam du pc pour les moments sans nao
 			'''
 			cap = cv2.VideoCapture(0)
@@ -136,6 +128,7 @@ class FilterColor:
 			    time.sleep(0.1)
 			    i += 1
 		        '''
+
 		        #Callback pour les trackbar
 			def callback(x):
 				pass 
@@ -145,23 +138,23 @@ class FilterColor:
 			for unobjet in objets:
 				nom = str(unobjet)+str(cameraCalibrage)
 				print "Calibrage de ", nom
-			#definition des fenêtres
+				#definition des fenêtres
 				cv2.namedWindow("Original",cv.CV_WINDOW_AUTOSIZE)
 				cv2.namedWindow("Configuration",cv.CV_WINDOW_AUTOSIZE)
 				cv2.namedWindow("Calibrage",cv.CV_WINDOW_AUTOSIZE)
 
-			#Variables pour le calibrage
-			# Teinte (Hue)
+				#Variables pour le calibrage
+				# Teinte (Hue)
 				h1=0
 				h2=255
-			# Saturation
+				# Saturation
 				s1=0
 				s2=255
-			# Valeur (Value)
+				# Valeur (Value)
 				v1=0
 				v2=255
 
-		        #creation des trackbar
+		        	#creation des trackbar
 				cv.CreateTrackbar("H_MIN","Configuration",h1,255,callback)
 				cv.CreateTrackbar("H_MAX","Configuration",h2,255,callback)
 				cv.CreateTrackbar("S_MIN","Configuration",s1,255,callback)
@@ -170,25 +163,21 @@ class FilterColor:
 				cv.CreateTrackbar("V_MAX","Configuration",v2,255,callback)
 
 				while True:
-				#On affiche la capture originale (Sinon, on fera sur video)
+					#On affiche la capture originale
 					cv2.imshow("Original", images[imageCourante])
 
-				#sur video
-				#images = cap.read()[1]
-				#cv2.imshow("Original", images)
 
-				#On convertis le colorspace de l'image en HSV
+					#On convertis le colorspace de l'image en HSV
 					imageHSV = cv2.cvtColor(images[imageCourante],cv2.COLOR_BGR2HSV)
 
-				#sur video
-				#imageHSV = cv2.cvtColor(images,cv2.COLOR_BGR2HSV)
+				
 
 					if imageCourante >= 9:
 						imageCourante = 0
 					else:
 						imageCourante = imageCourante + 1
 
-				#on recupère les valeurs des trackbars
+					#on recupère les valeurs des trackbars
 					h1 = cv2.getTrackbarPos("H_MIN","Configuration")
 					h2 = cv2.getTrackbarPos("H_MAX","Configuration")
 					s1 = cv2.getTrackbarPos("S_MIN","Configuration")
@@ -199,28 +188,17 @@ class FilterColor:
 					maxi = np.array([h2,s2,v2],np.uint8)
 				
 
-				#Filtre de l'image en fonction de la couleur
+					#Filtre de l'image en fonction de la couleur
 					imageHSV = cv2.medianBlur(imageHSV,15)
-				#imageHSV = cv2.blur(imageHSV,(10,10))
 					thresh = cv2.inRange(imageHSV,mini,maxi) 
 				
-			        #On va maintenant corriger quelques imperfection de l'image filtree
+			        	#On va maintenant corriger quelques imperfection de l'image filtree
 					thresh = cv2.medianBlur(thresh,15)
-			        #thresh = cv2.blur(thresh,(10,10))
 					kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(10,10))
-				#thresh = cv2.dilate(thresh,kernel,iterations=4)
-				#thresh = cv2.erode(thresh,kernel,iterations=4)
 					thresh = cv2.morphologyEx(thresh,cv2.MORPH_OPEN,kernel)
-				        '''
-				        #On effectue maintenant les traitements de l'image
-				        thresh = cv2.inRange(imageHSV,mini,maxi)
-					kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
-					thresh = cv2.dilate(thresh,kernel,iterations=2)
-					thresh = cv2.erode(thresh,kernel,iterations=1)
-					'''
 
 					
-				#Puis on affiche à l'écran l'image
+					#Puis on affiche à l'écran l'image
 				        cv2.imshow("Calibrage", thresh)
 
 					key = cv2.waitKey(10)
@@ -244,6 +222,7 @@ class FilterColor:
 				
 			cameraCalibrage += 1
 			cam.switchCamera() #On passe a l'autre camera pour la calibrer
+
 		#On recharge finalement les nouvelles configurations d'objets
 		fichier.close()
 		self.loadConfig()

@@ -182,36 +182,18 @@ class Decision:
 	
 	print "Execution terminée"
 
-    def routine (self):
-        #phase de calibrage
-        a = Analyse(self.videoProxy)
-        a.filtre.calibrage()
-        
-        angle_vision = (60*math.pi)/180 #angle de vision en radian
-        px_vision = 640     
-        
-        px_to_ang = angle_vision/640
-
-        mh = Head(self.motion,self.posture)
-        mh.reset()
-        while True :
-            DirBalle = a.BallPosition()
-            a.afficheImagesCourantes()
-            print "angle reel",(self.motion.getAngles("HeadYaw",True)[0]*180.0)/math.pi#," , ",self.motion.getAngles("HeadPitch",True)
-            #print "DirBalle",DirBalle
-            
-            if DirBalle is not None :
-                #x= -((60*DirBalle[0])/640)
-                x = -(DirBalle[0]* px_to_ang)#+(math.pi /2)
-                print "angle calculé =",(x*180)/math.pi
-                mh.incrAnglesTo(x,0.0)
-                #time.sleep(1)
-            #mh.incrAngle(DirBalle[0],DirBalle[1])
-
-
+    
     '''
-    marcheVersBalle va avancer jusqu'a ce que la balle soit totalement perdue
-    Ce mode va chercher a faire une approche grossière jusqu'a la balle
+    marcheVersBalle (self, zone_marche = None)
+    --------------------------------------------------------------------------------------
+    va avancer jusqu'a ce que la balle soit totalement perdue.
+    Ce mode va chercher a faire une approche grossière jusqu'a la balle.
+    On tiendra compte du fait que le robot ne marche pas droit
+    Fonctionnement:
+	-Faire comme si la balle est toujours au centre de l'image durant quelques analyses
+	-Calculer ensuite l'angle de deviation du robot par rapport à la detection de balle
+	-Reorienter le robot vers la nouvelle direction
+	-Changer de camera si la balle passe dans le champ de vision de la camera du bas
     '''
     def marcheVersBalle(self, zone_marche = None):
         print "debut mode : marcheVersBalle"
@@ -250,22 +232,16 @@ class Decision:
             centre = False
 
             if camera == 0:
-                #cerclesP = self.a.AnalyseImg(zone=zone_camera_haut, cercle=60)
                 self.a.afficheImagesCourantes()
-                #balle = self.a.meilleureBalle(cerclesP)
                 balle = self.a.AnalyseMultiImage(zone=zone_camera_haut, cercle=60)
-                #centre = self.a.testZone(zoneCentre_camera_haut)
                 print balle
                 if balle is not None:
                     centre = zoneCentre_camera_haut.isIn(balle)
                 else:
                     centre =  False
             else:
-                #cerclesP = self.a.AnalyseImg(cercle=60)
                 self.a.afficheImagesCourantes()
-                #balle = self.a.meilleureBalle(cerclesP)
                 balle = self.a.AnalyseMultiImage(cercle=60)
-                #centre = self.a.testZone(zoneCentre_camera_bas)
                 print balle
                 if balle is not None:
                     centre = zoneCentre_camera_bas.isIn(balle)
@@ -325,7 +301,6 @@ class Decision:
                             self.a.switchCamera() #On passe maintenant a la camera du bas
                             camera = 1
                             nbSpeculations = nbSpeculationsTotal
-                            #nbSpeculationsCentre = nbSpeculationsTotalCentre
                             continue #On recommence la boucle après notre changement de camera
                         else: #On a completement perdu la balle, on renvoie False car il faut repasser en mode recherche de balle
                             self.motion.stopMove()
@@ -336,8 +311,7 @@ class Decision:
                     angle = 0 #On va aller tout droit
 
             #On va maintenant changer l'angle de marche
-            print "DEBUG : l'angle de rotation est de ", angle
-            #self.motion.setWalkTargetVelocity(0.5,0,angle,0.3)
+            #print "DEBUG : l'angle de rotation est de ", angle #Message de debug pour le developpeur
             self.motion.moveTo(0.08,0,angle)
 
         print "fin mode : marcheVersBalle"       
@@ -349,7 +323,7 @@ class Decision:
 	c'est le mode ou le robot va ce mettre à croupis
 	et prendre la balle. Et ce relever.
     '''
-    def modePrendreBalle(self):#premiere vesion pour prendre la balle
+    def modePrendreBalle(self):
  		print "debut mode : modePrendreBalle" 
 		mo = Move(self.motion,self.posture)
 		mo.deboutPrendre()
@@ -364,18 +338,11 @@ class Decision:
 			if cpt > 30 :
 				return False
 		print "je peux prendre la balle!"
-		mo.aCroupris()#TODO modifier l'angle de tete pour 
+		mo.aCroupris()
 		print "ici je dois prendre la balle!!"
-		"""
-		while True :
-			pos = a.AnalyseImg(zone=zo,cercle=70)#pour dessiner la zone et le cercle
-			if pos != [] :
-				print "pos = ",pos[0][0]
-			a.afficheImagesCourantes()
-		"""
+		
 		#ici faire aussi un check sur les capteurs
 		mo.relever()
-		#mo.fermeMain()
 		#ici il faudrait faire une fonction check hand (verif main) 
 		print "fin mode : modePrendreBalle"
 		return True
@@ -386,16 +353,15 @@ class Decision:
 	modeRecherche(self, typeRecherche="balle"):
 	-----------------------------------------
 	mode qui permet de rerchercher la balle autour du robot ou les poteaux
+	Fonctionnement du mode :
+	  -Alterner entre camera du haut et camera du bas entre chaque position.
+	  -Tourner en rond sur lui meme jusqu'à trouver la balle.
+	  -reduire le pourcentage si on ne trouve pas la balle.
+	  -si il a plusieurs balles, on prendra celle qui a le meilleur pourcentage
+	   de remplissage.
+          -une fois la balle trouvée, tourner le robot le plus possible vers la balle.
     '''
     def modeRecherche(self, typeRecherche="balle", pourcentage=70):
-
-	#tourner en rond sur lui meme jusqu'à trouver la balle
-        #alterner entre camera du haut et camera du bas entre chaque position
-	#reduire le pourcentage si on ne trouve pas la balle
-	#utilisation de redBall traking
-	#si on trouve toujours pas prendre le rouge pour cible
-	#si il a plusieurs balles prendre celle qui est plus à gauche
-        #une fois la balle trouvée, tourner le robot le plus possible vers la balle
         
         if typeRecherche != "balle" and typeRecherche != "poteau":
             print "[modeRecherche] : Type de recherche inconnu : ", typeRecherche
@@ -406,8 +372,7 @@ class Decision:
         mh = Head(self.motion,self.posture)
         mo = Move(self.motion,self.posture)
         self.initialisation()
-        #self.a.filtre.calibrage(0)
-        #self.a.filtre.calibrage(1)
+
         rotationsTete = 0
         rotationsCorps = 0
         direction = 1 #1 pour la gauche et -1 pour la droite
@@ -418,61 +383,45 @@ class Decision:
         zone_camera_haut = DU.Zone((0,resolution[1]/2), resolution[0], resolution[1] /2 )
 
         while trouve is not True:
-        	#TODO : remplacer par AnalyseMultiImg !! AVOIR !!
-        	#----------------------------------------
-            """
-            nbImages = 5
-            while nbImages > 0:
-                if cameraNao == 0:
-                    cerclesP = self.a.AnalyseImg(zone=zone_camera_haut, cercle=pourcentage)
-                else:
-                    cerclesP = self.a.AnalyseImg(cercle=pourcentage)
-
-                if cerclesP != []:
-                    trouve = True
-                    balle = self.a.meilleureBalle(cerclesP)
-                    break
-                nbImages -= 1
-            """
             
+	    #On va commencer par rechercher la balle sur la caméra courante
             if cameraNao == 0:
                 balle = self.a.AnalyseMultiImage(zone=zone_camera_haut, cercle=pourcentage, nb_matching=3)
             else:
                 balle = self.a.AnalyseMultiImage(cercle=pourcentage, nb_matching=3)
             
             if balle is not None:
+		#On a trouvé la balle
                 trouve = True
-                 #----------------------------------------
-                 #----------------------------------------
+
+	    # Si la balle n'a pas été trouvée
             if not trouve:
                 self.a.afficheImagesCourantes()
+		#On change la caméra courante
                 if cameraNao == 0:
                     self.a.switchCamera()
                     cameraNao += 1
                 else:
                     self.a.switchCamera()
                     cameraNao = 0
-                    if rotationsTete < 4: #Si on n'a pas la balle, on va tourner la tete
-                        #if rotationsTete > 0 and rotationsTete % 2 == 0:
+		    
+                    if rotationsTete < 2: #Si on a pas déjà tourné la tête 2 fois (gauche et droite)
                         if rotationsTete > 0:
                             mh.reset() #On remet la tete droite
                             direction *= -1
 
-                        #angleIncr = direction * math.pi/4
                         angleIncr = direction * math.radians(60)
                         mh.incrAnglesTo(angleIncr,0.0)
                         rotationsTete += 1
 
-                    else: #On doit maintenant bouger le corps
+                    else: #On doit maintenant bouger le corps car on a déjà tourné la tête dans les deux directions
                         rotationsTete = 0
                         mh.reset()
-                        #mo.seRetourner()
                         mo.turnTo(math.pi/2)
 
-                        #rotationsCorps = 1 #OLD
                         rotationsCorps += 1
 
-                        #if rotationsCorps % 2 == 0: #OLD
+			#Reduction des exigences de recherche si on a effectué un tour complet
                         if rorationsCorps % 4 == 0:
                             rotationsCorps = 0
                             #On reduit finalement le pourcentage
@@ -481,16 +430,10 @@ class Decision:
                                 pourcentage = 0
                             
         
-        #ici on a trouvé la balle, il faudra surement enregistrer la zone ou autre
+        #ici on a trouvé la balle
         print "La balle choisie est : ", balle
         self.a.afficheImagesCourantes()
-        '''
-        while True:
-            key = cv2.waitKey(33)
-            key -= 0x100000
-            if key == 113: #on quitte avec la touche q
-                break 
-        '''
+        
         #Calcul de l'angle pour centrer la balle
         angleBalleImage = self.a.getAngle(balle)
         #On ajoute l'angle de la tete a l'angle calculé pour savoir de combien le corps devra se tourner 
@@ -500,6 +443,8 @@ class Decision:
         mh.reset() #on remet la tete droite
         #on tourne le corps
         mo.turnTo(angleBalleImage + angleYaw)
+	
+	#On enregistre une zone où la balle a été trouvée
         haut_zone = balle.y - 20
         if haut_zone < 0:
             haut_zone = 0
@@ -569,17 +514,27 @@ class Decision:
 		return True
 				
 
+    """
+	modeLancer(self):
+	--------------------------------------
+	Lancement de la balle en avant
+    """
     def modeLancer(self):
 	mo = Move(self.motion,self.posture)
-	#mo.deboutMarche()
 	mo.lancer()
 
 
+    """
+	initialisation(self):
+	--------------------------------------
+	Va mettre le robot debout et la tête
+	droite
+    """
     def initialisation(self):
         mh = Head(self.motion,self.posture)
         mo = Move(self.motion, self.posture)
         
         mo.debout()
-        mh.reset() #Regard devant soi
+        mh.reset() #Regarder devant soi
         
 

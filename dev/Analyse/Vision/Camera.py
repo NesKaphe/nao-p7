@@ -36,7 +36,7 @@ class Camera:
 		print "desinscription caméra"
 		self.unsubscribe()
 
-	
+
 	def subscribe(self):
 		self.proxy.subscribeCamera(self.moduleName, 
 					   self.camera, 

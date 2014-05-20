@@ -4,6 +4,10 @@ names = list()
 times = list()
 keys = list()
 
+'''
+Mouvement pour se relever après avoir ramassé la balle
+'''
+
 def move(motion) :
 
 	names.append("HeadPitch")
