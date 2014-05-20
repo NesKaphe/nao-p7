@@ -1,0 +1,12 @@
+@startuml
+
+[*] --> Recherche
+Recherche --> Marche : Balle trouvée
+Marche --> Recherche : Balle perdue
+Marche --> Approche : Balle proche
+Approche --> Recherche : Balle perdue
+Approche --> Ramasser : Balle positionnée
+Ramasser --> Recherche : Balle perdue
+Ramasser --> [*]
+
+@enduml
